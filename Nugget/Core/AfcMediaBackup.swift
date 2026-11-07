@@ -41,7 +41,7 @@ enum AfcMediaBackup {
         transferLock.lock()
         defer { transferLock.unlock() }
         guard !transferActive else {
-            throw GoldenNuggetError("A media transfer is still running. Wait for it to finish before changing the media store.")
+            throw GoldenNuggetError("媒体传输还在运行。请等它完成后再改动媒体库。")
         }
         transferActive = true
     }
@@ -254,8 +254,8 @@ enum AfcMediaBackup {
                 try? FileManager.default.removeItem(at: partial)
                 // Fatal: the store is the only copy once originals are deleted.
                 throw GoldenNuggetError(
-                    "AFC media: \(entry.path) failed after \(partialWritten) byte(s) — "
-                    + "no original was removed.")
+                    "AFC 媒体：\(entry.path) 在写入 \(partialWritten) 字节后失败——"
+                    + "没有移除任何原文件。")
             }
 
             // Verify before the irreversible half. The device's own size is the
@@ -265,8 +265,8 @@ enum AfcMediaBackup {
             guard copied == entry.size, written == entry.size else {
                 try? FileManager.default.removeItem(at: partial)
                 throw GoldenNuggetError(
-                    "AFC media: \(entry.path) size mismatch — device reports "
-                    + "\(entry.size), wrote \(copied) / \(written). Original kept.")
+                    "AFC 媒体：\(entry.path) 大小不匹配——设备报告"
+                    + "\(entry.size)，写入了 \(copied) / \(written)。原文件已保留。")
             }
 
             if FileManager.default.fileExists(atPath: destination.path) {
@@ -296,7 +296,7 @@ enum AfcMediaBackup {
                 let current = try await gateway.afcEntryInfo(path: entry.path)
                 guard !current.isDirectory, current.linkTarget == nil,
                       current.size == entry.size, current.modified == entry.modified else {
-                    throw GoldenNuggetError("AFC media: \(entry.path) changed during transfer. Original kept.")
+                    throw GoldenNuggetError("AFC 媒体：\(entry.path) 在传输过程中发生了变化。原文件已保留。")
                 }
                 do {
                     try await gateway.afcDelete(path: entry.path)
@@ -304,7 +304,7 @@ enum AfcMediaBackup {
                 } catch {
                     // The copy is already verified, so a failed delete is a
                     // lesser problem than the reverse and is reported, not fatal.
-                    onProgress?("AFC media: could not remove \(entry.path) — copy is intact")
+                    onProgress?("AFC 媒体：无法移除 \(entry.path)——副本完好")
                 }
             }
 
@@ -364,7 +364,7 @@ enum AfcMediaBackup {
         do {
             try await gateway.afcDelete(path: entry.path)
         } catch {
-            onProgress?("AFC media: could not remove \(entry.path) — copy is intact")
+            onProgress?("AFC 媒体：无法移除 \(entry.path)——副本完好")
             return nil
         }
         return Entry(source: entry.path, storedAs: storedAs, size: entry.size,
@@ -384,7 +384,7 @@ enum AfcMediaBackup {
             let attributes = try FileManager.default.attributesOfItem(atPath: local.path)
             guard attributes[.type] as? FileAttributeType == .typeRegular,
                   (attributes[.size] as? NSNumber)?.int64Value == entry.size else {
-                throw GoldenNuggetError("AFC media store is incomplete: \(entry.storedAs). Restore stopped; local copies kept.")
+                throw GoldenNuggetError("AFC 媒体库不完整：\(entry.storedAs)。恢复已停止；本地副本已保留。")
             }
         }
         let gateway = try await gateway()
@@ -417,7 +417,7 @@ enum AfcMediaBackup {
 
             let data = try Data(contentsOf: local)
             guard data.count == entry.size else {
-                throw GoldenNuggetError("AFC media store changed while reading \(entry.storedAs). Restore stopped.")
+                throw GoldenNuggetError("读取 \(entry.storedAs) 时 AFC 媒体库发生了变化。恢复已停止。")
             }
             try await gateway.afcWrite(path: entry.source, data: data)
 
@@ -426,8 +426,8 @@ enum AfcMediaBackup {
             // later as a truncated photo.
             let written = (try? await gateway.afcEntryInfo(path: entry.source))?.size ?? -1
             guard written == size else {
-                onProgress?("AFC push: \(entry.source) size mismatch — device reports "
-                    + "\(written), expected \(size)")
+                onProgress?("AFC 推送：\(entry.source) 大小不匹配——设备报告"
+                    + "\(written)，期望 \(size)")
                 skipped += 1
                 continue
             }
@@ -436,7 +436,7 @@ enum AfcMediaBackup {
         }
         onProgress?("AFC push: \(restored) restored, \(skipped) skipped")
         if skipped > 0 {
-            throw GoldenNuggetError("AFC media restore incomplete: \(skipped) file(s) could not be restored. Local copies kept.")
+            throw GoldenNuggetError("AFC 媒体恢复不完整：\(skipped) 个文件无法恢复。本地副本已保留。")
         }
     }
 
@@ -479,14 +479,14 @@ enum AfcMediaBackup {
         guard parts.count >= 2, trees.contains(String(parts[0])),
               !relative.contains("\\"), !relative.contains("\0"),
               parts.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." }) else {
-            throw GoldenNuggetError("Unsafe AFC media path: \(relative)")
+            throw GoldenNuggetError("不安全的 AFC 媒体路径：\(relative)")
         }
         var target = storeRoot
         for part in [""] + parts.map(String.init) {
             if !part.isEmpty { target.appendPathComponent(part) }
             if let attributes = try? FileManager.default.attributesOfItem(atPath: target.path),
                attributes[.type] as? FileAttributeType == .typeSymbolicLink {
-                throw GoldenNuggetError("Linked AFC media path: \(relative)")
+                throw GoldenNuggetError("被链接的 AFC 媒体路径：\(relative)")
             }
         }
         return target
@@ -510,7 +510,7 @@ enum AfcMediaBackup {
 
     private static func gateway() async throws -> IdeviceGateway {
         guard let gateway = Minimuxer.shared().ideviceGateway else {
-            throw GoldenNuggetError("AFC media: no idevice gateway — is the tunnel up?")
+            throw GoldenNuggetError("AFC 媒体：没有 idevice 网关——隧道通了吗？")
         }
         return gateway
     }
@@ -523,7 +523,7 @@ enum AfcMediaBackup {
         let fm = FileManager.default
         if !fm.fileExists(atPath: journalURL.path) {
             guard fm.createFile(atPath: journalURL.path, contents: nil) else {
-                throw GoldenNuggetError("AFC media: could not create the recovery journal. Originals kept.")
+                throw GoldenNuggetError("AFC 媒体：无法创建恢复日志。原文件已保留。")
             }
         }
         let handle = try FileHandle(forUpdating: journalURL)
@@ -629,12 +629,12 @@ enum AfcMediaBackup {
                 }
             }
         }
-        guard manifest.version == 1 else { throw GoldenNuggetError("Unsupported AFC media journal version.") }
+        guard manifest.version == 1 else { throw GoldenNuggetError("AFC 媒体日志版本不受支持。") }
         var sources = Set<String>()
         for entry in manifest.entries {
             guard entry.size >= 0, entry.source == "/" + entry.storedAs,
                   sources.insert(entry.source).inserted else {
-                throw GoldenNuggetError("Invalid AFC media journal entry: \(entry.source)")
+                throw GoldenNuggetError("AFC 媒体日志条目无效：\(entry.source)")
             }
             _ = try localMediaPath(entry.storedAs)
         }

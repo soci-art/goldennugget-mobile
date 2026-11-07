@@ -47,7 +47,7 @@ enum RestoreRunner {
         // Same two-part verdict as the backup: quiet with the device still
         // answering lockdown is waited out (up to 10 min), quiet and gone is not.
         try await StallGuard.run(
-            label: "restore",
+            label: "恢复",
             idleSeconds: 180,
             idle: { progress.lastActivityAt },
             wire: { WireCensus.totals() },

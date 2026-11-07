@@ -344,10 +344,10 @@ class GoldenNuggetEngine {
 
         guard !tweakPayloads.isEmpty || !skipSetup.payloads.isEmpty || posterBoard.isActive
                 || statusBar.isActive || templates.usesDomains else {
-            throw GoldenNuggetError("Nothing to apply: no tweak is enabled (or every enabled one "
-                + "was skipped), skip setup is off, the status bar is untouched, there is "
-                + "nothing selected on the PosterBoard page, and no template delivers through a "
-                + "backup domain.")
+            throw GoldenNuggetError("没有可应用的内容：没有启用任何调整（或者每个已启用的都"
+                + "被跳过了）、跳过设置处于关闭、状态栏未改动、"
+                + "PosterBoard 页没有选择任何内容，也没有模板通过"
+                + "备份域交付。")
         }
         log("Tweaks: \(tweakPayloads.count) file(s) from \(compiled.locations.count) plist(s)")
         for location in compiled.locations { log("  → \(location.rawValue)") }
@@ -387,11 +387,11 @@ class GoldenNuggetEngine {
             let carriesWallpapers = !posterBoard.tendies.isEmpty || posterBoard.video != nil
                 || hasPosterBoardTemplates
             if carriesWallpapers {
-                throw GoldenNuggetError("The PosterBoard page has a reset armed "
-                    + "(\(posterBoard.describe)) together with wallpapers selected. A reset run "
-                    + "installs no wallpapers — it clears the store and returns before the packs "
-                    + "are read — so applying this would wipe every wallpaper and add none. Turn "
-                    + "the reset off to install the wallpapers, or unselect them to run the reset.")
+                throw GoldenNuggetError("PosterBoard 页已有一个待执行的重置："
+                    + "（\(posterBoard.describe)），同时还选中了壁纸。重置运行"
+                    + "不会安装任何壁纸——它会清空库，并在读取壁纸包之前就返回"
+                    + "——所以这样应用会抹掉所有壁纸且不新增任何一张。请"
+                    + "关闭重置来安装壁纸，或者取消选择壁纸来执行重置。")
             }
             log("PosterBoard: \(posterBoard.describe) — this run clears the store and installs "
                 + "nothing.")
@@ -416,7 +416,7 @@ class GoldenNuggetEngine {
             do {
                 try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
             } catch {
-                throw GoldenNuggetError("Could not create the template working directory "
+                throw GoldenNuggetError("无法创建模板工作目录："
                     + "(\(work.lastPathComponent)): \(error.localizedDescription)")
             }
             for template in deliverable {
@@ -530,7 +530,7 @@ class GoldenNuggetEngine {
             return
         }
 
-        try await deliver(payloads: payloads, udid: udid, version: version, label: "apply",
+        try await deliver(payloads: payloads, udid: udid, version: version, label: "应用",
                           posterBoardSnapshot: posterBoardSnapshotDirectory) {
             log("Apply succeeded: the device confirmed it finished.")
             log("Reboot the device so the injected preferences take effect.")
@@ -558,9 +558,9 @@ class GoldenNuggetEngine {
             let plan = try CommunityApplyRecord.resetPlan(udid)
             for path in plan.remaining { log("Community file requires manual recovery: \(path)") }
             guard !plan.payloads.isEmpty else {
-                throw GoldenNuggetError("No recorded Managed Preferences to reset. Other replaced files require manual recovery: \(plan.remaining.joined(separator: ", "))")
+                throw GoldenNuggetError("没有已记录的可重置的托管偏好。其他被替换的文件需要手动恢复：\(plan.remaining.joined(separator: ", "))")
             }
-            try await deliver(payloads: plan.payloads, udid: udid, version: version, label: "community reset") {
+            try await deliver(payloads: plan.payloads, udid: udid, version: version, label: "社区重置") {
                 log("Community Managed Preferences reset. Reboot the device.")
             }
             try CommunityApplyRecord.didReset(udid)
@@ -575,22 +575,22 @@ class GoldenNuggetEngine {
     private func checkAirliftCanApply(posterBoard: PosterBoardSelection,
                                      templates: [TemplateFile] = [], deviceVersion: String, buildVersion: String = "") throws {
         if templates.contains(where: \.isContainer) {
-            throw GoldenNuggetError("AirLift only installs template descriptors. A selected template "
-                + "also carries container files; switch to \"Protective backup\" to apply all of them.")
+            throw GoldenNuggetError("AirLift 只安装模板描述文件。所选模板"
+                + "还带有容器文件；请切换到「保护性备份」来应用全部内容。")
         }
         if posterBoard.fullReset || !posterBoard.resetModes.isEmpty {
-            throw GoldenNuggetError("AirLift cannot reset the PosterBoard store — it only adds "
-                + "wallpapers. Switch the apply mode to \"Protective backup\" for a reset.")
+            throw GoldenNuggetError("AirLift 无法重置 PosterBoard 库——它只会添加"
+                + "壁纸。要重置，请把应用模式切换到「保护性备份」。")
         }
         if posterBoard.video != nil {
-            throw GoldenNuggetError("AirLift cannot apply a PosterBoard video: its frames are "
-                + "staged for a restore. Switch the apply mode to \"Protective backup\".")
+            throw GoldenNuggetError("AirLift 无法应用 PosterBoard 视频：它的帧是"
+                + "是为恢复准备的。请把应用模式切换到「保护性备份」。")
         }
         let reason = Airlift.unsupportedReason(deviceVersion: deviceVersion, buildVersion: buildVersion)
         guard reason.isEmpty else { throw GoldenNuggetError(reason) }
         guard FileManager.default.fileExists(atPath: AppPaths.pairingFile.path) else {
-            throw GoldenNuggetError("AirLift needs a pairing record and none is stored. Import one "
-                + "on the home page first.")
+            throw GoldenNuggetError("AirLift 需要一份配对记录，但还没有保存任何一份。"
+                + "请先在首页导入一份。")
         }
     }
 
@@ -714,7 +714,7 @@ class GoldenNuggetEngine {
         let ios27 = major >= 27 && !dev.forcePartialRestore
         let hasEligibility = payloads.contains { $0.domain == "SysContainerDomain-com.apple.eligibilityd" }
         if hasEligibility && !ios27 {
-            throw GoldenNuggetError("Siri AI overrides require an unencrypted protective backup. Disable forced partial restore and retry.")
+            throw GoldenNuggetError("Siri AI 覆盖需要一份未加密的保护性备份。请关闭强制部分恢复后重试。")
         }
         // Reported before the fork, because this number *is* the fork: the
         // branch lines below say where the run went, this says why.
@@ -744,7 +744,7 @@ class GoldenNuggetEngine {
                 let data = try Data(contentsOf: manifestURL)
                 let manifest = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
                 guard manifest?["IsEncrypted"] as? Bool == false else {
-                    throw GoldenNuggetError("Siri AI overrides require a confirmed unencrypted protective backup. Disable local backup encryption in Finder/iTunes and retry.")
+                    throw GoldenNuggetError("Siri AI 覆盖需要一份已确认的未加密保护性备份。请在访达/iTunes 中关闭本地备份加密后重试。")
                 }
             }
             prune = true
@@ -829,7 +829,7 @@ class GoldenNuggetEngine {
         defer { runStage.done() }
 
         guard !pages.isEmpty else {
-            throw GoldenNuggetError("No page was selected — nothing to reset.")
+            throw GoldenNuggetError("没有选择任何页面——没有可重置的内容。")
         }
 
         let udid = try await prepareRun()
@@ -844,7 +844,7 @@ class GoldenNuggetEngine {
 
         let plan = TweakReset.plan(pages: pages, ios27: ios27)
         guard !plan.payloads.isEmpty else {
-            throw GoldenNuggetError("Every selected page resolved to no file — nothing to reset.")
+            throw GoldenNuggetError("所选页面都对应不到任何文件——没有可重置的内容。")
         }
 
         // The reference appends the skip-setup files to the *reset's* file list
@@ -909,7 +909,7 @@ class GoldenNuggetEngine {
             ios27: ios27
         )
 
-        try await runRestore(backupRoot: backupRoot, udid: udid, label: "page reset") {
+        try await runRestore(backupRoot: backupRoot, udid: udid, label: "页面重置") {
             log("Reset succeeded: the device confirmed it finished.")
             log("The pages above are back to their defaults. The selections in this app are "
                 + "untouched — applying again would write the tweaks back.")
@@ -1066,15 +1066,15 @@ class GoldenNuggetEngine {
             // store's own lock would reject this with a generic "busy", which
             // reads like a stuck app rather than a copy still in progress.
             guard !AfcMediaBackup.isTransferActive else {
-                throw GoldenNuggetError("A copy from the device is still running. "
-                    + "Restore media can start once it finishes — what it has copied so "
-                    + "far is already kept.")
+                throw GoldenNuggetError("从设备拷贝的操作还在运行。"
+                    + "等它完成之后就可以开始恢复媒体——它已经拷好的内容"
+                    + "都已经保留下来了。")
             }
             let manifest = try AfcMediaBackup.read()
             guard !manifest.entries.isEmpty else {
                 throw GoldenNuggetError(
-                    "The media store is empty — there is nothing to put back. The Media "
-                    + "page's Pull button fills it, and setup fills it automatically.")
+                    "媒体库是空的——没有可放回设备的内容。媒体页的"
+                    + "「拉取」按钮可以填充它，设置过程也会自动填充。")
             }
             let bytes = manifest.entries.reduce(0) { $0 + $1.size }
             log("AFC media: restoring \(manifest.entries.count) file(s), "
@@ -1129,10 +1129,10 @@ class GoldenNuggetEngine {
         try await HotLoadService.requireAllowed()
         let minimuxer = Minimuxer.shared()
         guard await testReady(minimuxer) else {
-            throw GoldenNuggetError("minimuxer is not ready. Ensure WiFi and a working tunnel (LocalDevVPN or WireGuard + em_proxy), then select a pairing file.")
+            throw GoldenNuggetError("minimuxer 尚未就绪。请确保 Wi-Fi 和隧道可用（LocalDevVPN 或 WireGuard + em_proxy），然后选择配对文件。")
         }
         guard let udid = try await minimuxer.core.fetchUDID() else {
-            throw GoldenNuggetError("Could not fetch device UDID")
+            throw GoldenNuggetError("无法获取设备 UDID")
         }
         log("UDID: \(udid)")
         log("Tunnel: \(Tunnel.describe())")
@@ -1163,10 +1163,10 @@ class GoldenNuggetEngine {
         let identity = await DeviceIdentity.read()
         guard !identity.version.isEmpty else {
             throw GoldenNuggetError(
-                "Could not read the device's iOS version (lockdown ProductVersion), which this run "
-                + "needs to choose a manifest format: iOS 27+ gets a protective backup pulled from the "
-                + "device with a sqlite Manifest.db, iOS 26 a legacy MBDB backup synthesised on the "
-                + "host. Unlock the device, confirm the tunnel is up, then run again.")
+                "无法读取设备的 iOS 版本（lockdown 的 ProductVersion），而本次运行"
+                + "需要靠它来选择清单格式：iOS 27+ 会从"
+                + "设备拉取一份带 sqlite Manifest.db 的保护性备份，iOS 26 则用在主机"
+                + "上合成的旧式 MBDB 备份。请解锁设备、确认隧道已连通，然后再运行一次。")
         }
         log("device version: lockdown answered \(identity.version)")
         return identity.version

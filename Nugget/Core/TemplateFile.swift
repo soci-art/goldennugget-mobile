@@ -23,12 +23,12 @@ enum TemplateArchive {
             let archive = try Archive(url: url, accessMode: .read)
             for entry in archive {
                 guard TemplatePath.isSafe(entry.path), entry.type != .symlink else {
-                    throw TemplateFile.fail("Unsafe template archive member: \(entry.path)")
+                    throw TemplateFile.fail("不安全的模板归档成员：\(entry.path)")
                 }
             }
             return Handle(archive: archive)
         } catch {
-            throw TemplateFile.TemplateError("\(url.lastPathComponent) is not a readable .batter archive: "
+            throw TemplateFile.TemplateError("\(url.lastPathComponent) 不是可读的 .batter 归档："
                 + error.localizedDescription)
         }
     }
@@ -51,7 +51,7 @@ enum TemplateArchive {
         /// The entry's bytes.
         func data(at path: String) throws -> Data {
             guard let entry = archive.first(where: { $0.path == path }) else {
-                throw TemplateFile.TemplateError("\(path) is not in the archive.")
+                throw TemplateFile.TemplateError("\(path) 不在归档中。")
             }
             let directory = try TemplateArchive.stagingDirectory()
             defer { try? FileManager.default.removeItem(at: directory) }
@@ -68,8 +68,8 @@ enum TemplateArchive {
                 let relative = entry.path
                 guard entry.type != .symlink,
                       let target = TemplatePath.destination(relative, under: destination) else {
-                    throw TemplateFile.TemplateError("the archive holds an entry that escapes the extraction "
-                        + "directory (\(relative)).")
+                    throw TemplateFile.TemplateError("归档里有一个条目会逃出解压目录："
+                        + "目录（\(relative)）。")
                 }
                 if entry.type == .directory {
                     try? fm.createDirectory(at: target, withIntermediateDirectories: true)
@@ -107,7 +107,7 @@ enum TemplateArchive {
         guard process.terminationStatus == 0 else {
             try? FileManager.default.removeItem(at: scratch)
             throw TemplateFile.TemplateError(
-                "\(url.lastPathComponent) is not a readable .batter archive.")
+                "\(url.lastPathComponent) 不是可读的 .batter 归档。")
         }
         return Handle(root: scratch)
     }
@@ -143,8 +143,8 @@ enum TemplateArchive {
                       !relative.split(separator: "/").contains(".."),
                       target.standardizedFileURL.path
                         .hasPrefix(destination.standardizedFileURL.path) else {
-                    throw TemplateFile.TemplateError("refusing to write \(relative) outside the extraction "
-                        + "directory.")
+                    throw TemplateFile.TemplateError("拒绝把 \(relative) 写到解压目录之外："
+                        + "目录。")
                 }
                 if isDirectory.boolValue {
                     try? fm.createDirectory(at: target, withIntermediateDirectories: true)
@@ -295,8 +295,8 @@ static func stagingDirectory() throws -> URL {
             break
         }
         guard let jsonPath else {
-            throw TemplateError("\(url.lastPathComponent) has no \(Self.configName) in it. "
-                + "A .batter file is a ZIP holding a \(Self.configName).")
+            throw TemplateError("\(url.lastPathComponent) 里没有 \(Self.configName)。"
+                + ".batter 文件是一个装着 \(Self.configName) 的 ZIP。")
         }
         self.jsonPath = jsonPath
 
@@ -305,22 +305,22 @@ static func stagingDirectory() throws -> URL {
         // existing call site — so this reads through the same helper that file
         // uses rather than a second spelling of it.
         guard let configData = try? archive.data(at: jsonPath) else {
-            throw TemplateError("\(url.lastPathComponent): could not read \(jsonPath) out of it.")
+            throw TemplateError("\(url.lastPathComponent)：无法从中读取 \(jsonPath)。")
         }
         guard let raw = try? JSONSerialization.jsonObject(with: configData),
               let data = raw as? [String: Any] else {
-            throw TemplateError("\(jsonPath) is not a JSON object.")
+            throw TemplateError("\(jsonPath) 不是 JSON 对象。")
         }
 
         // MARK: the required header
 
         guard let optionsData = data["options"] as? [Any] else {
-            throw TemplateError("\(jsonPath) has no \"options\" list. Make sure it is in the "
-                + "correct format.")
+            throw TemplateError("\(jsonPath) 没有 \"options\" 列表。请确保它符合"
+                + "正确的格式。")
         }
         guard var domain = data["domain"] as? String else {
-            throw TemplateError("\(jsonPath) has no \"domain\", so there is nowhere to restore "
-                + "this template to.")
+            throw TemplateError("\(jsonPath) 没有 \"domain\"，所以没有地方可以把"
+                + "这个模板恢复到那里。")
         }
         // Backwards compatibility for the reference's own v5.2-beta slip, which
         // wrote the bare bundle id here.
@@ -328,27 +328,27 @@ static func stagingDirectory() throws -> URL {
         self.domain = domain
 
         guard let rawFormat = data["format_version"] else {
-            throw TemplateError("\(jsonPath) has no \"format_version\".")
+            throw TemplateError("\(jsonPath) 没有 \"format_version\"。")
         }
         // The reference does `int(data['format_version'])`, so `"2"` and `2` are
         // both accepted and `"two"` raises `ValueError` — a refusal here too.
         guard let formatVersion = TemplateFile.integer(rawFormat) else {
-            throw TemplateError("\(jsonPath)'s \"format_version\" is \(rawFormat), which is not "
-                + "a whole number.")
+            throw TemplateError("\(jsonPath) 的 \"format_version\" 是 \(rawFormat)，而不是"
+                + "整数。")
         }
         guard formatVersion <= Self.currentFormat else {
-            throw TemplateError("\(url.lastPathComponent) needs a newer version of this app "
-                + "(its config is format \(formatVersion); this app reads up to "
-                + "\(Self.currentFormat)).")
+            throw TemplateError("\(url.lastPathComponent) 需要更新版本的应用："
+                + "（它的配置是格式 \(formatVersion)；本应用最高可读到"
+                + "\(Self.currentFormat)）。")
         }
         self.formatVersion = formatVersion
 
         guard let title = data["title"] as? String else {
-            throw TemplateError("\(jsonPath) has no \"title\".")
+            throw TemplateError("\(jsonPath) 没有 \"title\"。")
         }
         self.title = title
         guard let author = data["author"] as? String else {
-            throw TemplateError("\(jsonPath) has no \"author\".")
+            throw TemplateError("\(jsonPath) 没有 \"author\"。")
         }
         self.author = author
         self.description = data["description"] as? String
@@ -374,23 +374,23 @@ static func stagingDirectory() throws -> URL {
         if let deviceVersion, !deviceVersion.isEmpty {
             if let minVersion = self.minVersion {
                 guard let atLeast = PosterBoard.compareVersion(deviceVersion, minVersion) else {
-                    throw TemplateError("This device reports iOS \"\(deviceVersion)\", which is "
-                        + "not a version, so \(url.lastPathComponent)'s iOS \(minVersion) "
-                        + "requirement cannot be checked.")
+                    throw TemplateError("这台设备报告的 iOS 是「\(deviceVersion)」，它"
+                        + "不是一个版本号，所以 \(url.lastPathComponent) 的 iOS \(minVersion) "
+                        + "要求无法检查。")
                 }
                 guard atLeast >= 0 else {
-                    throw TemplateError("\(url.lastPathComponent) requires iOS \(minVersion). "
+                    throw TemplateError("\(url.lastPathComponent) 需要 iOS \(minVersion)。"
                         + "This device is on iOS \(deviceVersion).")
                 }
             }
             if let maxVersion = self.maxVersion {
                 guard let atMost = PosterBoard.compareVersion(deviceVersion, maxVersion) else {
-                    throw TemplateError("This device reports iOS \"\(deviceVersion)\", which is "
-                        + "not a version, so \(url.lastPathComponent)'s iOS \(maxVersion) ceiling "
-                        + "cannot be checked.")
+                    throw TemplateError("这台设备报告的 iOS 是「\(deviceVersion)」，它"
+                        + "不是一个版本号，所以 \(url.lastPathComponent) 的 iOS \(maxVersion) 上限"
+                        + "无法检查。")
                 }
                 guard atMost <= 0 else {
-                    throw TemplateError("\(url.lastPathComponent) supports up to iOS \(maxVersion). "
+                    throw TemplateError("\(url.lastPathComponent) 最高支持 iOS \(maxVersion)。"
                         + "This device is on iOS \(deviceVersion).")
                 }
             }
@@ -429,14 +429,14 @@ static func stagingDirectory() throws -> URL {
                 for entryName in archive.names where TemplateGlob.fnmatch(pattern, entryName) {
                     guard let bytes = try? archive.data(at: entryName) else { continue }
                     guard let target = TemplatePath.destination(entryName, under: destination) else {
-                        throw TemplateError("Unsafe template resource path: \(entryName)")
+                        throw TemplateError("不安全的模板资源路径：\(entryName)")
                     }
                     try? FileManager.default.createDirectory(at: target.deletingLastPathComponent(),
                                                             withIntermediateDirectories: true)
                     do {
                         try bytes.write(to: target)
                     } catch {
-                        throw TemplateError("Could not stage \(entryName) out of "
+                        throw TemplateError("无法从以下位置暂存 \(entryName)："
                             + "\(url.lastPathComponent): \(error.localizedDescription)")
                     }
                     // `clean_path` is the entry's path with the base stripped,
@@ -487,11 +487,11 @@ static func stagingDirectory() throws -> URL {
         var bundleIDOption = false
         for entry in optionsData {
             guard let optionData = entry as? [String: Any] else {
-                throw TemplateError("\(jsonPath)'s \"options\" contains something that is not an "
-                    + "object.")
+                throw TemplateError("\(jsonPath) 的 \"options\" 含有不是"
+                    + "对象的内容。")
             }
             guard let typeName = optionData["type"] as? String else {
-                throw TemplateError("An option in \(jsonPath) has no \"type\".")
+                throw TemplateError("\(jsonPath) 中的一个选项没有 \"type\"。")
             }
             switch TemplateOptionKind(rawValue: typeName) {
             case .replace:
@@ -507,8 +507,8 @@ static func stagingDirectory() throws -> URL {
                 // reference turns it into exactly that (`change_bundle_id`).
                 bundleIDOption = true
             case .none:
-                throw TemplateError("\"\(typeName)\" is not an option type this app knows. The "
-                    + "types are: replace, remove, set, picker, bundle_id.")
+                throw TemplateError("「\(typeName)」不是本应用认识的选项类型。"
+                    + "类型有：replace、remove、set、picker、bundle_id。")
             }
         }
         self.options = parsed

@@ -43,7 +43,7 @@ struct PosterBoardView: View {
 
     @ObservedObject private var device = DeviceIdentityMonitor.shared
     private var identity: DeviceIdentity { device.current }
-    @State private var databaseSummary = "not checked yet"
+    @State private var databaseSummary = "尚未检查"
     @State private var pickError: String?
     /// Only the database fetch runs from this page — the apply is the home page's.
     @State private var status: String?
@@ -553,7 +553,7 @@ struct PosterBoardView: View {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
         let candidates = names.filter { $0.hasSuffix(".sqlite3") }.sorted()
         guard let name = candidates.last else {
-            databaseSummary = "none yet — an apply that adds a wallpaper fetches one"
+            databaseSummary = "暂无——添加壁纸的应用操作会获取一个"
             return
         }
         let url = directory.appendingPathComponent(name)
@@ -565,7 +565,7 @@ struct PosterBoardView: View {
         }
         let when = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
         databaseSummary = "\(ByteCountFormatter.string(fromByteCount: size, countStyle: .file)), "
-            + "fetched \(when)"
+            + "获取于 \(when)"
     }
 
     private func importPack(_ result: Result<URL, Error>) {
@@ -580,11 +580,11 @@ struct PosterBoardView: View {
                 // code does.
                 guard existing + pack.descriptorCount <= PosterBoardImports.descriptorLimit else {
                     PosterBoardImports.remove(pack)
-                    throw GoldenNuggetError("\(pack.name) carries \(pack.descriptorCount) "
-                        + "descriptor(s), which would take the selection to "
-                        + "\(existing + pack.descriptorCount). PosterBoard's picker gets "
-                        + "unusable past \(PosterBoardImports.descriptorLimit) — remove a pack "
-                        + "first.")
+                    throw GoldenNuggetError("\(pack.name) 带有 \(pack.descriptorCount) 个"
+                        + "描述文件，选择后总数将达到 "
+                        + "\(existing + pack.descriptorCount) 个。PosterBoard 的选择器超过 "
+                        + "\(PosterBoardImports.descriptorLimit) 个就无法使用——请先移除一个包"
+                        + "。")
                 }
                 selection.loadFromDisk()
                 pickError = nil
@@ -629,10 +629,10 @@ struct PosterBoardView: View {
             var tone: GoldenTone = .primary
             do {
                 try await GoldenNuggetEngine.shared.fetchPosterBoardDatabase()
-                text = "Database fetched."
+                text = "数据库已获取。"
                 tone = .success
             } catch let failure as TransportFailure where failure.isCancellation {
-                text = "⏹ stopped by the user (\(failure.label))"
+                text = "⏹ 已被用户停止（\(failure.label)）"
                 tone = .warning
             } catch {
                 text = "❌ \(error.localizedDescription)"
@@ -666,10 +666,10 @@ struct PosterBoardView: View {
             do {
                 try await GoldenNuggetEngine.shared.applyPosterBoardViaAirlift(
                     selection, deviceVersion: identity.version)
-                text = "Applied over AirLift. The device resprung — no backup was taken."
+                text = "已通过 AirLift 应用。设备已注销——没有做备份。"
                 tone = .success
             } catch let failure as TransportFailure where failure.isCancellation {
-                text = "⏹ stopped by the user (\(failure.label))"
+                text = "⏹ 已被用户停止（\(failure.label)）"
                 tone = .warning
             } catch {
                 text = "❌ \(error.localizedDescription)"

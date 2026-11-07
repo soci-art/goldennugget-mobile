@@ -161,7 +161,7 @@ enum WalletEngine {
                       progress: @escaping (Double) -> Void) async throws {
         let withImages = cards.filter { $0.isSelected && $0.imageData != nil }
         guard !withImages.isEmpty else {
-            throw GoldenNuggetError("No card has a skin selected.")
+            throw GoldenNuggetError("没有为任何卡片选择皮肤。")
         }
 
         let total = Double(withImages.count)
@@ -217,8 +217,8 @@ enum WalletEngine {
         }
 
         guard written > 0 else {
-            throw GoldenNuggetError("No card skin was written. The device has to be unlocked "
-                + "with LocalDevVPN up.")
+            throw GoldenNuggetError("没有写入任何卡片皮肤。设备必须解锁"
+                + "并保持 LocalDevVPN 连通。")
         }
         log("Applied \(written)/\(withImages.count) card skin(s). Force-quit Wallet to see them.")
     }

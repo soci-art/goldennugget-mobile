@@ -192,7 +192,7 @@ enum PasscodeThemeReader {
 
         let files = (FileManager.default.subpaths(atPath: stage.path) ?? [])
         guard !files.isEmpty else {
-            throw GoldenNuggetError("\(url.lastPathComponent) unpacked to nothing.")
+            throw GoldenNuggetError("\(url.lastPathComponent) 解包后什么都没有。")
         }
 
         var previews: [String: UIImage] = [:]
@@ -214,7 +214,7 @@ enum PasscodeThemeReader {
         }
 
         guard !previews.isEmpty else {
-            throw GoldenNuggetError("\(url.lastPathComponent) has no keypad images in it.")
+            throw GoldenNuggetError("\(url.lastPathComponent) 里没有任何键盘图片。")
         }
         return PasscodeThemeInfo(name: url.lastPathComponent,
                                  filePath: url.path,
@@ -297,7 +297,7 @@ enum PasscodeThemeEngine {
                       log: @escaping (String) -> Void,
                       progress: @escaping (Double) -> Void) async throws {
         guard !theme.rawKeyData.isEmpty else {
-            throw GoldenNuggetError("\(theme.name) has no key images in it.")
+            throw GoldenNuggetError("\(theme.name) 里没有任何按键图片。")
         }
         let stage = try stage(theme: theme, language: language, weight: weight)
         defer { try? FileManager.default.removeItem(at: stage) }
@@ -326,12 +326,12 @@ enum PasscodeThemeEngine {
         }
 
         guard written > 0 else {
-            throw GoldenNuggetError("No keypad cache was written. Unlock the device and check the AirLift connection.")
+            throw GoldenNuggetError("没有写入任何键盘缓存。请解锁设备并检查 AirLift 连接。")
         }
         if written < roots.count {
-            log("Keypad theme written to \(written)/\(roots.count) cache locations.")
+            log("键盘主题已写入 \(written)/\(roots.count) 个缓存位置。")
         }
-        log("Lock the device to see the keypad.")
+        log("锁定设备即可看到键盘效果。")
     }
 
     /// Build the on-disk matrix a theme turns into.

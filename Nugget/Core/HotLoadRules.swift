@@ -63,7 +63,7 @@ struct HotLoadRules: Codable {
         var policy = HotLoadPolicy()
         // Desktop's built-in safety rule also applies before the first fetch.
         if TweakVersion.compare(deviceVersion, "26.6.1") == 0 {
-            policy.hiddenFeatures["Daemons"] = "Daemon changes are blocked on iOS 26.6.1 because a reported configuration caused the device to freeze at the passcode screen."
+            policy.hiddenFeatures["Daemons"] = "守护进程改动在 iOS 26.6.1 上被阻止，因为有报告称某种配置会导致设备卡在锁屏密码界面。"
         }
         for rule in rules where rule.matches(appVersion: appVersion, deviceVersion: deviceVersion, model: model) {
             switch rule.action ?? "" {
@@ -177,14 +177,14 @@ struct HotLoadPolicy {
         let hiddenLocations = Set(TweakCatalog.allWithDaemons.filter { hidden.contains($0.id) }.map { $0.location.rawValue })
         let blockedDestinations = Set(hiddenLocations.compactMap { TweakDomainMap.split(path: $0) }.map { "\($0.domain)/\(TweakPayload.manifestPath($0.relativePath))" })
         if payloads.contains(where: { blockedDestinations.contains($0.label) }) {
-            throw HotLoadBlocked(reason: "A community write targets a feature hidden by safety rules.")
+            throw HotLoadBlocked(reason: "有一条社区写入指向了被安全规则隐藏的功能。")
         }
     }
 
     func requireAllowed(features: Set<String> = []) throws {
         if let reason = gateReason { throw HotLoadBlocked(reason: reason) }
         for feature in features.sorted() {
-            if let reason = hiddenFeatures[feature] { throw HotLoadBlocked(reason: "\(feature): \(reason)") }
+            if let reason = hiddenFeatures[feature] { throw HotLoadBlocked(reason: "\(feature)：\(reason)") }
         }
     }
 }

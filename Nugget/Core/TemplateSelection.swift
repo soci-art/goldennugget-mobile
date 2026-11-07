@@ -102,7 +102,7 @@ enum TemplateImports {
         do {
             try FileManager.default.copyItem(at: source, to: destination)
         } catch {
-            throw TemplateFile.fail("Could not copy \(source.lastPathComponent) into the app: "
+            throw TemplateFile.fail("无法把 \(source.lastPathComponent) 拷贝进应用："
                 + error.localizedDescription)
         }
         do {

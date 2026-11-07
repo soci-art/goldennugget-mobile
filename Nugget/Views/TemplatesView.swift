@@ -229,7 +229,7 @@ struct TemplatesView: View {
                             replaceTarget = (templateIndex, optionIndex)
                             showReplaceImporter = true
                         } label: {
-                            Label(value.value == nil ? value.buttonLabel : "Replace chosen file",
+                            Label(value.value == nil ? value.buttonLabel : "替换所选文件",
                                   systemImage: value.value == nil ? "square.and.arrow.down" : "arrow.triangle.2.circlepath")
                         }
                         .buttonStyle(.bordered)
@@ -270,7 +270,7 @@ struct TemplatesView: View {
                         ? String(localized: "Removes the element \"\(identifier)\" (by its CoreAnimation id) from: \(value.files.joined(separator: ", ")).")
                         : String(localized: "Removes the element \"\(identifier)\" from: \(value.files.joined(separator: ", "))."))
                 } else {
-                    NativeNote(String(localized: "Deletes: \(value.files.joined(separator: ", "))."))
+                    NativeNote(String(localized: "删除：\(value.files.joined(separator: ", "))."))
                 }
                 if value.inverted {
                     NativeNote("Inverted: the targets are deleted while this is **off**.")
@@ -420,7 +420,7 @@ struct TemplatesView: View {
         var parts = [value.useCAID
             ? String(localized: "Sets \(value.key) on element \"\(value.identifier)\" (by its CoreAnimation id).")
             : String(localized: "Sets \(value.key) on element \"\(value.identifier)\".")]
-        parts.append(String(localized: "Applies to: \(value.files.joined(separator: ", "))."))
+        parts.append(String(localized: "适用于：\(value.files.joined(separator: ", "))."))
         if value.valueType == "float" {
             parts.append(String(localized: "Declared as a float, so the slider works in thousandths."))
         }
@@ -444,7 +444,7 @@ struct TemplatesView: View {
             ? String(localized: "Every choice you do not pick is deleted before the files are delivered.")
             : String(localized: "The choices you do not pick are deleted before the files are delivered.")]
         if value.renames {
-            parts.append(String(localized: "The chosen files are renamed to: \(value.names.joined(separator: ", "))."))
+            parts.append(String(localized: "所选文件会被重命名为：\(value.names.joined(separator: ", "))."))
         }
         return parts.joined(separator: " ")
     }

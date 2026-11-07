@@ -651,7 +651,7 @@ enum DaemonGroups {
     /// 0-byte file written over the plist rather than a serialised dict.
     static let screenTime = DaemonNullify(
         id: "ClearScreenTimeAgentPlist",
-        title: "Disable Screen Time Agent",
+        title: "禁用屏幕时间代理",
         path: "/var/mobile/Library/Preferences/com.apple.ScreenTimeAgent.plist"
     )
 }
@@ -687,9 +687,8 @@ extension TweakCatalog {
             iphoneOnly: false,
             ipadOnly: false,
             disabled: false,
-            detail: group.information ?? "Disables \(group.labels.count) launchd "
-                + "\(group.labels.count == 1 ? "daemon" : "daemons"): "
-                + group.labels.joined(separator: ", ") + ".",
+            detail: group.information ?? "禁用 \(group.labels.count) 个 launchd 守护进程："
+                + group.labels.joined(separator: "、") + "。",
             multiValues: Dictionary(
                 uniqueKeysWithValues: group.labels.map { ($0, TweakValue.bool(false)) }
             )
@@ -714,8 +713,7 @@ extension TweakCatalog {
         iphoneOnly: false,
         ipadOnly: false,
         disabled: false,
-        detail: "Writes a 0-byte file over "
-            + "\(DaemonGroups.screenTime.path).",
+        detail: "在 \(DaemonGroups.screenTime.path) 上覆盖写入一个 0 字节文件。",
         multiValues: nil
     )
 }

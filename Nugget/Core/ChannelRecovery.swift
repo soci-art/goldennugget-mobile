@@ -59,7 +59,7 @@ enum ChannelRecovery {
 
                 case .retry(let floor, let why):
                     if attempt >= attempts {
-                        AppLog.write("\(label) did not get through in \(attempt) attempts — giving up.")
+                        AppLog.write("\(label) 在 \(attempt) 次尝试后仍未通过——放弃。")
                         if let diagnostics { AppLog.write(await diagnostics()) }
                         throw error
                     }

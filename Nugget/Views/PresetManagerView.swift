@@ -234,7 +234,7 @@ struct PresetManagerView: View {
     private func saveCurrent() {
         let name = newName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else {
-            setMessage("Enter a name for this preset.", .warning)
+            setMessage("为这个预设输入一个名字。", .warning)
             return
         }
         let ok = GoldenNuggetPresets.save(name,
@@ -243,13 +243,13 @@ struct PresetManagerView: View {
                                           iosVersion: identity.version,
                                           description: newDescription)
         guard ok else {
-            setMessage("Failed to save the preset.", .error)
+            setMessage("保存预设失败。", .error)
             return
         }
         let stored = GoldenNuggetPresets.sanitize(name)
         do { try CommunityTemplateStore.shared.saveSelection(in: stored) }
         catch { setMessage(error.localizedDescription, .error); return }
-        setMessage("Preset \"\(stored)\" saved.", .success)
+        setMessage("预设「\(stored)」已保存。", .success)
         newName = ""
         newDescription = ""
         refresh()
@@ -258,7 +258,7 @@ struct PresetManagerView: View {
 
     private func requestLoad() {
         guard let info = selected else {
-            setMessage("Select a preset first.", .warning)
+            setMessage("请先选择一个预设。", .warning)
             return
         }
         confirmLoad = info
@@ -283,12 +283,12 @@ struct PresetManagerView: View {
         var mismatches: [String] = []
         if let saved = majorVersion(info.iosVersion),
            let current = majorVersion(identity.version), saved != current {
-            mismatches.append("iOS \(saved)x vs current iOS \(current)x")
+            mismatches.append("保存时 iOS \(saved)x，当前 iOS \(current)x")
         }
         let savedType = deviceType(info.deviceModel)
         let currentType = deviceType(identity.productType)
         if !savedType.isEmpty && !currentType.isEmpty && savedType != currentType {
-            mismatches.append("\(savedType) vs current \(currentType)")
+            mismatches.append("保存时 \(savedType)，当前 \(currentType)")
         }
         guard !mismatches.isEmpty else { return nil }
         return String(localized: "This preset contains daemon modifications that were saved for a different device:")
@@ -298,17 +298,17 @@ struct PresetManagerView: View {
 
     private func performLoad(_ info: GoldenNuggetPresets.PresetInfo) {
         guard let preset = GoldenNuggetPresets.load(info.name) else {
-            setMessage("Failed to load the preset.", .error)
+            setMessage("加载预设失败。", .error)
             return
         }
-        apply(preset, label: "Preset \"\(info.name)\" loaded.")
+        apply(preset, label: "预设「\(info.name)」已加载。")
     }
 
     /// `rollback_preset_flow` (`preset_menu.py:188`): the `__Rollback` snapshot
     /// loaded through the ordinary path.
     private func requestRollback() {
         guard GoldenNuggetPresets.hasRollback else {
-            setMessage("There is no previous successful apply to roll back yet.", .warning)
+            setMessage("还没有可回滚的上一次成功应用。", .warning)
             return
         }
         confirmRollback = true
@@ -316,10 +316,10 @@ struct PresetManagerView: View {
 
     private func performRollback() {
         guard let preset = GoldenNuggetPresets.loadRollback() else {
-            setMessage("There is no previous successful apply to roll back yet.", .warning)
+            setMessage("还没有可回滚的上一次成功应用。", .warning)
             return
         }
-        apply(preset, label: "Rolled back to the previous applied state.")
+        apply(preset, label: "已回滚到上一次应用的状态。")
     }
 
     /// `PresetManager.load_preset`'s observable effect, ported: apply the parsed
@@ -349,32 +349,32 @@ struct PresetManagerView: View {
 
     private func export(include: Set<String>?) {
         guard let info = selected else {
-            setMessage("Select a preset first.", .warning)
+            setMessage("请先选择一个预设。", .warning)
             return
         }
         guard let data = GoldenNuggetPresets.exportData(for: info.name, include: include) else {
-            setMessage("Failed to export preset.", .error)
+            setMessage("导出预设失败。", .error)
             return
         }
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(GoldenNuggetPresets.sanitize(info.name)).gnpreset")
         do {
-            guard let document = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw CommunityError("Invalid preset.") }
+            guard let document = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw CommunityError("预设无效。") }
             try PortablePreset.export(document, to: url)
             share = ShareItem(url: url)
         } catch {
-            setMessage("Failed to export preset: \(error.localizedDescription)", .error)
+            setMessage("导出预设失败：\(error.localizedDescription)", .error)
         }
     }
 
     private func requestPartialExport() {
         guard let info = selected else {
-            setMessage("Select a preset first.", .warning)
+            setMessage("请先选择一个预设。", .warning)
             return
         }
         let ids = GoldenNuggetPresets.tweakIDs(for: info.name)
         guard !ids.isEmpty else {
-            setMessage("This preset has no tweaks to export.", .warning)
+            setMessage("这个预设没有可导出的调整。", .warning)
             return
         }
         partialExport = PartialExportTarget(info: info, ids: ids)
@@ -382,11 +382,11 @@ struct PresetManagerView: View {
 
     private func performDelete(_ info: GoldenNuggetPresets.PresetInfo) {
         guard GoldenNuggetPresets.delete(info.name) else {
-            setMessage("Failed to delete the preset.", .error)
+            setMessage("删除预设失败。", .error)
             return
         }
         if selectedName == info.name { selectedName = nil }
-        setMessage("Preset \"\(info.name)\" deleted.", .success)
+        setMessage("预设「\(info.name)」已删除。", .success)
         refresh()
     }
 
@@ -399,9 +399,9 @@ struct PresetManagerView: View {
         if ok {
             refresh()
             selectedName = result
-            setMessage("Preset \"\(result)\" imported successfully.", .success)
+            setMessage("预设「\(result)」导入成功。", .success)
         } else {
-            setMessage("Failed to import preset: \(result)", .error)
+            setMessage("导入预设失败：\(result)", .error)
         }
     }
 

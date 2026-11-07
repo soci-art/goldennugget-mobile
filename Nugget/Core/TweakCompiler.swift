@@ -117,7 +117,7 @@ struct TweakPayloadUnavailable: Error, LocalizedError {
     let reason: String
 
     var errorDescription: String? {
-        "The payload for \(payload) is gone from disk (\(file)): \(reason)"
+        "\(payload) 的载荷已从磁盘上消失（\(file)）：\(reason)"
     }
 }
 
@@ -140,7 +140,7 @@ enum TweakCompiler {
             if let index = result.firstIndex(where: { $0.domain == payload.domain && $0.relativePath == payload.relativePath }) {
                 guard var values = try PropertyListSerialization.propertyList(from: result[index].bytes(), options: [], format: nil) as? [String: Any],
                       let overlay = try PropertyListSerialization.propertyList(from: payload.bytes(), options: [], format: nil) as? [String: Any] else {
-                    throw TweakPayloadUnavailable(payload: payload.label, file: payload.relativePath, reason: "Conflicting community file write")
+                    throw TweakPayloadUnavailable(payload: payload.label, file: payload.relativePath, reason: "社区文件写入冲突")
                 }
                 values.merge(overlay) { _, builtIn in builtIn }
                 let data = try PropertyListSerialization.data(fromPropertyList: values, format: .xml, options: 0)

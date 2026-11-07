@@ -147,7 +147,7 @@ enum TransportFailure: Error, LocalizedError {
     var retryDecision: RetryDecision {
         switch self {
         case .cancelled:
-            return .failFast(reason: "stopped by the user — not retrying.")
+            return .failFast(reason: "已被用户停止——不再重试。")
 
         // A handshake stall is NOT a dropped channel: the device accepted the
         // connection and never said a single word.  A fresh RSD tunnel does not
@@ -157,12 +157,12 @@ enum TransportFailure: Error, LocalizedError {
         // 2 minutes) to arrive at the same place.  Worst case: the device daemon
         // is wedged and only a reboot clears it.
         case .handshakeSilent:
-            return .failFast(reason: "the device never answered the handshake")
+            return .failFast(reason: "设备始终没有回应握手")
 
         // A plain channel drop is a state of the session: drop the RSD adapter
         // and dial again.
         case .channelLost:
-            return .retry(floor: .dropRSD, reason: "dropped the channel")
+            return .retry(floor: .dropRSD, reason: "通道已断开")
 
         // A MID-STREAM stall is a different animal: the exchange ran, data
         // landed, and the stream then went quiet.  The backup already on disk
@@ -171,7 +171,7 @@ enum TransportFailure: Error, LocalizedError {
         // because the gateway caches both the RSD adapter AND the IP the Rust
         // tunnel dials, and either being stale reproduces the stall exactly.
         case .streamStalled:
-            return .retry(floor: .refreshEndpoint, reason: "went quiet mid-stream")
+            return .retry(floor: .refreshEndpoint, reason: "传输中途没了动静")
 
         // A tunnel crawl is retried for a stronger reason than "worth one more
         // try": it is a *state* of the jktcp connection, and the recovery below
@@ -184,69 +184,67 @@ enum TransportFailure: Error, LocalizedError {
         // on the crawl message).
         case .tunnelCrawl:
             return .retry(floor: .restartMuxer,
-                          reason: "lost its tunnel (the tunnel stopped delivering)")
+                          reason: "隧道丢失（隧道停止传输）")
 
         case .deviceRejected:
-            return .failFast(reason: "the device rejected the request")
+            return .failFast(reason: "设备拒绝了请求")
         case .deviceLocked:
-            return .failFast(reason: "the device is locked")
+            return .failFast(reason: "设备已锁定")
         // A short restore is deterministic: the same manifest goes to the same
         // device and it stops at the same place.  The work is in the host-side
         // accounting, not in another attempt.
         case .restoreIncomplete:
-            return .failFast(reason: "the restore stopped short of completion")
+            return .failFast(reason: "恢复未完成便停了下来")
         case .notReady:
-            return .failFast(reason: "the device gateway is not initialized")
+            return .failFast(reason: "设备网关尚未初始化")
         case .unknown:
-            return .failFast(reason: "not a channel drop")
+            return .failFast(reason: "不是通道断开")
         }
     }
 
     var errorDescription: String? {
         switch self {
         case .cancelled(let label):
-            return "\(label) stopped by the user — the in-flight call was abandoned "
-                + "(a blocked Rust read cannot be interrupted, only walked away from)"
+            return "\(label)已被用户停止——进行中的调用已被放弃"
+                + "（阻塞中的 Rust 读取无法中断，只能直接走开）"
 
         case .handshakeSilent(let label, let held):
-            return "device never sent its first DeviceLink message during \(label) "
-                + "(silent for \(held)s). The mobilebackup2 client is a pure reader at this point "
-                + "— the device initiates with DLMessageVersionExchange and we only answer — so nothing "
-                + "the app sends can cause this, and the currently loaded binary is not a suspect. "
-                + "The device-side backup daemon is the one not talking: it wedges on a request it cannot "
-                + "process and stays wedged across app restarts, so REBOOT THE DEVICE before "
-                + "retrying. Background: scripts/patch-idevice-target-identifier.sh"
+            return "在\(label)期间，设备始终没有发出它的第一条 DeviceLink 消息"
+                + "（已沉默 \(held) 秒）。此时 mobilebackup2 客户端只是一个纯读取者"
+                + "——由设备先发出 DLMessageVersionExchange，我们只负责应答——所以应用发出的任何东西"
+                + "都不可能导致这个问题，当前加载的程序也不是嫌疑对象。"
+                + "不说话的是设备端的备份守护进程：它会卡在某个无法处理的请求上，"
+                + "而且重启应用也解不开，所以重试前请先重启设备。"
+                + "背景：scripts/patch-idevice-target-identifier.sh"
 
         case .streamStalled(let label, let held, let verdict):
-            var s = "the \(label) stream went quiet for \(held)s — neither the host callbacks "
-                + "nor the DeviceLink channel moved"
-            if let verdict { s += ". Out-of-band check when the silence started: \(verdict)" }
-            s += ". The two causes look identical from here and the app log tells them apart: a "
-                + "device-side phase that is slow but alive (the retry continues from the backup already "
-                + "on disk, so it only costs the baseline), or a mobilebackup2 stream that is wedged or "
-                + "desynchronised after a host-side file error (see the 'delegate errors' line)."
+            var s = "\(label)的数据流已经 \(held) 秒没有动静——主机回调"
+                + "和 DeviceLink 通道都没有任何进展"
+            if let verdict { s += "。沉默开始时的带外检查：\(verdict)" }
+            s += "。从这里看两种成因长得一模一样，靠应用日志来区分：一种是设备端某个阶段只是慢但还活着"
+                + "（重试会从磁盘上已有的备份继续，所以只损失基线进度），另一种是 mobilebackup2 数据流"
+                + "在主机端文件错误后卡死或失去同步（见日志中的 'delegate errors' 一行）。"
             return s
 
         case .tunnelCrawl(let label, let span, let gap, let rate, let outOfOrder,
                           let retransmits, let heldDropped):
-            var s = "the \(label) tunnel stopped delivering: jktcp is still receiving segments from "
-                + "the device (\(outOfOrder) out-of-order so far)"
-            s += ", \(gap / 1024) KB of it stuck behind an unfilled gap"
-            s += String(format: ", delivery crawled at %.1f KB/s", rate / 1024)
-            s += " for \(span)s. What was measured is the transport refusing to hand bytes up. "
-                + "Everything above this layer looks healthy throughout (lockdown answers, and a "
-                + "liveness probe calls the device alive)."
+            var s = "\(label)的隧道停止传输了：jktcp 仍在从设备接收数据段"
+                + "（到目前为止有 \(outOfOrder) 个乱序）"
+            s += "，其中 \(gap / 1024) KB 卡在一个未填补的缺口后面"
+            s += String(format: "，传输速度慢到只有 %.1f KB/s", rate / 1024)
+            s += "，持续了 \(span) 秒。测到的现象是传输层拒绝向上交付字节。"
+                + "这一层之上的一切全程看起来都健康（lockdown 有应答，"
+                + "存活探测也判定设备在线）。"
             // The measurement that decides what to do next.  A hole closes only
             // when the peer re-sends the missing range, so "did it re-send
             // anything" separates a slow recovery from a dead end.
             if retransmits > 0 {
-                s += " The peer did re-send \(retransmits) range(s), so the gap is being worked on — "
-                    + "it is closing slowly rather than not at all."
+                s += " 对端确实重发了 \(retransmits) 段数据，说明缺口正在被处理"
+                    + "——只是在慢慢合拢，而不是完全不动。"
             } else {
-                s += " The peer has re-sent NOTHING across the whole window (jktcp logged no "
-                    + "retransmission at all), so waiting cannot clear this: the bytes behind the gap "
-                    + "are already held, but the missing range never comes back. Rebuilding the "
-                    + "connection is what closes it."
+                s += " 在整个时间窗内对端什么都没有重发（jktcp 没有记录到任何重传），"
+                    + "所以靠等解决不了：缺口后面的字节已经被收下，但缺失的那一段永远不会回来。"
+                    + "重建连接才能合上它。"
             }
             // What the receiver did with the data behind the gap.
             //
@@ -259,13 +257,11 @@ enum TransportFailure: Error, LocalizedError {
             // the old wording in place would send the next reader after a
             // receiver bug that is not there.
             if heldDropped > 0 {
-                s += " \(heldDropped) segment(s) had to be refused because the reorder window was "
-                    + "full, so part of the stream WAS dropped rather than held — that part needs a "
-                    + "retransmission too."
+                s += " 有 \(heldDropped) 个数据段因为重排窗口已满而不得不被拒绝，"
+                    + "所以这部分数据流确实是被丢弃而不是被暂存——这部分也需要重传。"
             } else {
-                s += " The receiver held every segment it received (the reorder window never filled), "
-                    + "so nothing behind the gap was thrown away — it is simply undeliverable until "
-                    + "the missing range arrives."
+                s += " 接收方暂存了它收到的每一个数据段（重排窗口从未填满），"
+                    + "所以缺口后面的东西没有被丢掉——只是在缺失的那一段到达之前无法交付。"
             }
             // Do NOT assert that a datagram was dropped.  The contiguous run
             // makes "one datagram lost" a good guess — a tunnel datagram carries
@@ -280,10 +276,10 @@ enum TransportFailure: Error, LocalizedError {
             // attempts produced gaps of the same magnitude and different bytes
             // (2915 / 2920 / 3048 / 3083 / 3184 / 3277 KB).  Same size, different
             // range, is not a fixed offset in a replayed stream.
-            s += " Whether this was one lost tunnel datagram (a contiguous hole is what that looks "
-                + "like) or a deterministic stall at a fixed offset, check before concluding: "
-                + "identical gap AND identical out-of-order count on a fresh tunnel rule randomness "
-                + "out; a gap of the same SIZE but different bytes does not."
+            s += " 这到底是丢失了一个隧道数据报（连续的空洞正是那种样子），"
+                + "还是在固定偏移处确定性卡死，下结论前请核对：在一条全新隧道上"
+                + "缺口大小与乱序计数都完全相同，才能排除随机性；"
+                + "缺口大小相同但字节不同则不能。"
             return s
 
         case .channelLost(let label, let raw):
@@ -292,38 +288,36 @@ enum TransportFailure: Error, LocalizedError {
             // per-port sender when the connection is torn down, so a DEVICE-SIDE
             // close and a local pump failure look identical here.  It therefore
             // cannot be read as "the device refused us".
-            return "\(label) dropped the channel: \(raw). \"channel closed\" is jktcp's generic "
-                + "flow-closed report — it does not distinguish a device-side teardown from a local "
-                + "stack failure. See minimuxer.log (Rust, DEBUG) for the real step."
+            return "\(label)把通道弄断了：\(raw)。\"channel closed\" 是 jktcp 对连接关闭的通用"
+                + "报告——它区分不了是设备端拆的还是本地协议栈出的故障。"
+                + "真正的出错步骤见 minimuxer.log（Rust，DEBUG）。"
 
         case .deviceRejected(let label, let raw):
-            return "the device rejected \(label): \(raw). This is a validation answer, not a dropped "
-                + "channel, so the same bytes will be refused again — fix the backup, do not retry."
+            return "设备拒绝了\(label)：\(raw)。这是校验层面的答复，不是通道断开，"
+                + "同样的字节会再被拒绝一次——请修好备份，不要重试。"
 
         case .deviceLocked(let label, let raw):
-            return "\(label) was refused because the device is locked (\(raw)). iOS will not run a "
-                + "mobilebackup2 backup or restore against a locked device, so this is not the "
-                + "tunnel and not the backup — unlock the screen and keep it awake, then run again. "
-                + "Worth knowing when this appears on a later attempt: a crawl leaves the screen "
-                + "alone for minutes, so the device locks itself in the middle of the run and the "
-                + "NEXT attempt is the one that reports it."
+            return "\(label)被拒绝，因为设备已锁定（\(raw)）。iOS 不会对锁定的设备运行 "
+                + "mobilebackup2 备份或恢复，所以这既不是隧道的问题也不是备份的问题"
+                + "——解锁屏幕并保持唤醒，然后再运行一次。"
+                + "值得知道的一点：如果这条出现在后续的重试里——隧道爬行会让屏幕几分钟无人触碰，"
+                + "设备会在运行中途自己锁上，报告这个错误的往往是下一次尝试。"
 
         case .restoreIncomplete(let label, let raw):
-            return "\(label) stopped short: \(raw). The device ended the exchange without naming an "
-                + "error, which is exactly why nothing looked wrong — a restore it abandons part-way "
-                + "closes the stream as cleanly as one it finishes, and the host used to free the "
-                + "device's response plist unread instead of asking it what happened. Two independent "
-                + "signals are now checked (the response plist's ErrorCode, and how far the device's "
-                + "progress got), and this one says both came back empty. Retrying sends the same "
-                + "manifest to the same device, so the next step is the host-side accounting: compare "
-                + "the 'commit:' / 'delegate errors:' lines and 'device pulled N file(s)' against how "
-                + "many payloads the manifest offered, and check what the filter kept versus drained."
+            return "\(label)中途停下了：\(raw)。设备结束交互时没有给出任何错误，"
+                + "这正是当时看起来一切正常的原因——它半途放弃的恢复，关闭数据流的样子"
+                + "和顺利完成的毫无区别，而主机过去会把设备的响应 plist 没读就释放掉，"
+                + "而不是问它发生了什么。现在会检查两个独立信号（响应 plist 的 ErrorCode，"
+                + "以及设备的进度走到了哪一步），而这一次两个都返回了空。"
+                + "重试是把同一份清单发给同一台设备，所以下一步是主机端的账目核对："
+                + "把 'commit:' / 'delegate errors:' 日志行和 'device pulled N file(s)' "
+                + "与清单提供的载荷数量对比，并检查过滤器留下了什么、排掉了什么。"
 
         case .notReady(let label, let raw):
-            return "\(label) could not run: the device gateway is not ready (\(raw))"
+            return "\(label)无法运行：设备网关尚未就绪（\(raw)）"
 
         case .unknown(let label, let raw):
-            return "\(label) failed: \(raw)"
+            return "\(label)失败：\(raw)"
         }
     }
 }

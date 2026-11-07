@@ -72,13 +72,13 @@ struct GoldenNuggetPreset {
         do {
             root = try JSONSerialization.jsonObject(with: data, options: [])
         } catch {
-            throw GoldenNuggetError("autosave.json: not valid JSON (\(error.localizedDescription))")
+            throw GoldenNuggetError("autosave.json：不是有效的 JSON（\(error.localizedDescription)）")
         }
         guard let object = root as? [String: Any] else {
-            throw GoldenNuggetError("autosave.json: top level is not a JSON object")
+            throw GoldenNuggetError("autosave.json：顶层不是 JSON 对象")
         }
         guard object["tweaks"] != nil || object["metadata"] != nil else {
-            throw GoldenNuggetError("autosave.json: no \"tweaks\" or \"metadata\" — not a GoldenNugget preset")
+            throw GoldenNuggetError("autosave.json：没有 \"tweaks\" 或 \"metadata\"——不是 GoldenNugget 预设")
         }
 
         return GoldenNuggetPreset(metadata: parseMetadata(object["metadata"]),

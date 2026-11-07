@@ -53,7 +53,7 @@ enum PosterBoardSnapshot {
         return try offers.sorted(by: { $0.key < $1.key }).map { path, hostName in
             let fileID = URL(fileURLWithPath: hostName).lastPathComponent
             guard fileID.count == 40, fileID.allSatisfy(\.isHexDigit) else {
-                throw GoldenNuggetError("PosterBoard snapshot has an invalid file ID for \(path).")
+                throw GoldenNuggetError("PosterBoard 快照中 \(path) 的文件 ID 无效。")
             }
             let candidates = [
                 deviceDir.appendingPathComponent(String(fileID.prefix(2))).appendingPathComponent(fileID),
@@ -61,7 +61,7 @@ enum PosterBoardSnapshot {
                 deviceDir.appendingPathComponent("Snapshot/\(fileID.prefix(2))/\(fileID)"),
             ]
             guard let source = candidates.first(where: { FileManager.default.fileExists(atPath: $0.path) }) else {
-                throw GoldenNuggetError("PosterBoard snapshot is missing \(path). Apply stopped to preserve existing wallpapers.")
+                throw GoldenNuggetError("PosterBoard 快照缺少 \(path)。应用已停止，以保留现有壁纸。")
             }
             return TweakPayload(domain: PosterBoard.domain, relativePath: path, source: source)
         }
@@ -90,13 +90,13 @@ extension PosterBoardSnapshot {
                               SQLITE_OPEN_READWRITE, nil) == SQLITE_OK, let db else {
             let detail = db.map { String(cString: sqlite3_errmsg($0)) } ?? "no SQLite handle"
             sqlite3_close(db)
-            throw GoldenNuggetError("Could not open PosterBoard snapshot Manifest.db: \(detail).")
+            throw GoldenNuggetError("无法打开 PosterBoard 快照的 Manifest.db：\(detail)。")
         }
         defer { sqlite3_close(db) }
         var stmt: OpaquePointer?
         guard sqlite3_prepare_v2(db, "SELECT fileID, relativePath, flags, file FROM Files WHERE domain = ? ORDER BY relativePath", -1, &stmt, nil) == SQLITE_OK else {
             let detail = String(cString: sqlite3_errmsg(db))
-            throw GoldenNuggetError("Could not read PosterBoard snapshot manifest (SQLite \(sqlite3_extended_errcode(db))): \(detail).")
+            throw GoldenNuggetError("无法读取 PosterBoard 快照清单（SQLite \(sqlite3_extended_errcode(db))）：\(detail)。")
         }
         defer { sqlite3_finalize(stmt) }
         let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
@@ -107,14 +107,14 @@ extension PosterBoardSnapshot {
             if step == SQLITE_DONE { break }
             guard step == SQLITE_ROW, let idText = sqlite3_column_text(stmt, 0),
                   let pathText = sqlite3_column_text(stmt, 1), let bytes = sqlite3_column_blob(stmt, 3) else {
-                throw GoldenNuggetError("PosterBoard snapshot contains an unreadable file record.")
+                throw GoldenNuggetError("PosterBoard 快照包含不可读的文件记录。")
             }
             let id = String(cString: idText)
             let path = String(cString: pathText)
             let flags = sqlite3_column_int(stmt, 2)
             guard id.count == 40, id.allSatisfy(\.isHexDigit), [1, 2, 4].contains(flags),
                   path.isEmpty || relativePath(deviceName: PosterBoard.domain + "/" + path, container: "") == path else {
-                throw GoldenNuggetError("PosterBoard snapshot contains an invalid path or file type.")
+                throw GoldenNuggetError("PosterBoard 快照包含无效的路径或文件类型。")
             }
             var source: URL?
             if flags == 1 {
@@ -122,14 +122,14 @@ extension PosterBoardSnapshot {
                                   deviceDir.appendingPathComponent(id)]
                 source = candidates.first { FileManager.default.fileExists(atPath: $0.path) }
                 guard source != nil else {
-                    throw GoldenNuggetError("PosterBoard snapshot is incomplete: \(path). Restore stopped before changing the device.")
+                    throw GoldenNuggetError("PosterBoard 快照不完整：\(path)。恢复已在改动设备之前停止。")
                 }
             }
             result.append(Record(fileID: id, path: path, flags: flags,
                                  blob: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, 3))), source: source))
         }
         guard result.contains(where: { storeVersion(relativePath: $0.path) != nil && $0.flags == 1 }) else {
-            throw GoldenNuggetError("PosterBoard snapshot does not contain its live database.")
+            throw GoldenNuggetError("PosterBoard 快照不包含它的实时数据库。")
         }
         return result
     }
@@ -146,11 +146,11 @@ extension PosterBoardSnapshot {
         var db: OpaquePointer?
         guard sqlite3_open(staging.appendingPathComponent("Manifest.db").path, &db) == SQLITE_OK else {
             sqlite3_close(db)
-            throw GoldenNuggetError("Could not prepare the PosterBoard recovery snapshot.")
+            throw GoldenNuggetError("无法准备 PosterBoard 恢复快照。")
         }
         let status = sqlite3_exec(db, "CREATE TABLE Files (fileID TEXT PRIMARY KEY, domain TEXT, relativePath TEXT, flags INTEGER, file BLOB)", nil, nil, nil)
         sqlite3_close(db)
-        guard status == SQLITE_OK else { throw GoldenNuggetError("Could not create the PosterBoard recovery manifest.") }
+        guard status == SQLITE_OK else { throw GoldenNuggetError("无法创建 PosterBoard 恢复清单。") }
         _ = try merge(from: sourceDir, into: staging)
         try fm.moveItem(at: staging, to: destination)
     }
@@ -225,17 +225,17 @@ extension PosterBoardSnapshot {
         var db: OpaquePointer?
         guard sqlite3_open(targetDir.appendingPathComponent("Manifest.db").path, &db) == SQLITE_OK, let db else {
             sqlite3_close(db)
-            throw GoldenNuggetError("Could not open the restore manifest for PosterBoard.")
+            throw GoldenNuggetError("无法打开 PosterBoard 的恢复清单。")
         }
         defer { sqlite3_close(db) }
         guard sqlite3_exec(db, "BEGIN IMMEDIATE", nil, nil, nil) == SQLITE_OK else {
-            throw GoldenNuggetError("Could not begin the PosterBoard snapshot merge.")
+            throw GoldenNuggetError("无法开始 PosterBoard 快照合并。")
         }
         var committed = false
         defer { if !committed { sqlite3_exec(db, "ROLLBACK", nil, nil, nil) } }
         var stmt: OpaquePointer?
         guard sqlite3_prepare_v2(db, "INSERT OR REPLACE INTO Files (fileID, domain, relativePath, flags, file) VALUES (?, ?, ?, ?, ?)", -1, &stmt, nil) == SQLITE_OK else {
-            throw GoldenNuggetError("Could not prepare the PosterBoard manifest merge.")
+            throw GoldenNuggetError("无法准备 PosterBoard 清单合并。")
         }
         defer { sqlite3_finalize(stmt) }
         let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
@@ -260,11 +260,11 @@ extension PosterBoardSnapshot {
             sqlite3_bind_int(stmt, 4, row.flags)
             _ = row.blob.withUnsafeBytes { sqlite3_bind_blob(stmt, 5, $0.baseAddress, Int32($0.count), transient) }
             guard sqlite3_step(stmt) == SQLITE_DONE else {
-                throw GoldenNuggetError("Could not preserve PosterBoard manifest entry \(row.path).")
+                throw GoldenNuggetError("无法保留 PosterBoard 清单条目 \(row.path)。")
             }
         }
         guard sqlite3_exec(db, "COMMIT", nil, nil, nil) == SQLITE_OK else {
-            throw GoldenNuggetError("Could not commit the PosterBoard snapshot merge.")
+            throw GoldenNuggetError("无法提交 PosterBoard 快照合并。")
         }
         committed = true
         return RestoredSnapshot(

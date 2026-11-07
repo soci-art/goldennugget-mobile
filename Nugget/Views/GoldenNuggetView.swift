@@ -351,9 +351,9 @@ struct GoldenNuggetView: View {
     }
 
     /// `home.py: update_status` — the same three states in the same colours:
-    /// green "Supported!", amber "Partially Supported" when a pairing file is
+    /// green "Supported!", amber "部分支持" when a pairing file is
     /// loaded but lockdown has not said what the device is, plain
-    /// "Not connected" otherwise.
+    /// "未连接" otherwise.
     private var connectionLine: some View {
         Section {
             Text(connectionState.text)
@@ -364,8 +364,8 @@ struct GoldenNuggetView: View {
     }
 
     private var connectionState: (text: String, tone: GoldenTone) {
-        guard paired else { return ("Not connected", .secondary) }
-        guard !identity.version.isEmpty else { return ("Partially Supported", .warning) }
+        guard paired else { return ("未连接", .secondary) }
+        guard !identity.version.isEmpty else { return ("部分支持", .warning) }
         return ("Supported!", .success)
     }
 
@@ -475,7 +475,7 @@ struct GoldenNuggetView: View {
     private var mediaCard: some View {
         Section("Media") {
             if let totals = mediaTotals, totals.files > 0 {
-                Text("\(totals.files) photo(s) and video(s) — \(ByteCountFormatter.string(fromByteCount: totals.bytes, countStyle: .file)) kept in the app")
+                Text("\(totals.files) 个照片和视频文件——\(ByteCountFormatter.string(fromByteCount: totals.bytes, countStyle: .file)) 保存在应用中")
                     .font(.subheadline)
             } else {
                 Text("No photos or videos copied yet")
@@ -531,10 +531,10 @@ struct GoldenNuggetView: View {
             var tone: GoldenTone = .primary
             do {
                 try await GoldenNuggetEngine.shared.restoreMedia()
-                text = "Media restored to the device."
+                text = "媒体已恢复到设备。"
                 tone = .success
             } catch let failure as TransportFailure where failure.isCancellation {
-                text = "⏹ stopped by the user (\(failure.label))"
+                text = "⏹ 已被用户停止（\(failure.label)）"
                 tone = .warning
             } catch {
                 text = "❌ \(error.localizedDescription)"
@@ -563,11 +563,11 @@ struct GoldenNuggetView: View {
             var recordedError = ""
             do {
                 try await GoldenNuggetEngine.shared.resetPages(pages: pages)
-                text = "Reset done. Reboot the device."
+                text = "重置完成。请重启设备。"
                 tone = .success
                 succeeded = true
             } catch let failure as TransportFailure where failure.isCancellation {
-                text = "⏹ stopped by the user (\(failure.label))"
+                text = "⏹ 已被用户停止（\(failure.label)）"
                 tone = .warning
                 recordedError = "stopped by the user (\(failure.label))"
             } catch {
@@ -1186,14 +1186,14 @@ struct GoldenNuggetView: View {
                                                                 isIPhone: device.isIPhone, deviceModel: device.productType,
                                                                 communityPayloads: try CommunityTemplateStore.shared.compile(version: device.version),
                                                                 communityPresetEntry: CommunityTemplateStore.shared.presetEntry)
-                text = "Applied. Reboot the device."
+                text = "已应用。请重启设备。"
                 tone = .success
                 succeeded = true
             } catch let failure as TransportFailure where failure.isCancellation {
                 // Stopping on purpose is not a failure — say so, and do not let it
                 // read like the device did something wrong. The engine has already
                 // written both of these into the log file.
-                text = "⏹ stopped by the user (\(failure.label))"
+                text = "⏹ 已被用户停止（\(failure.label)）"
                 tone = .warning
                 recordedError = "stopped by the user (\(failure.label))"
             } catch {
@@ -1248,9 +1248,9 @@ struct GoldenNuggetView: View {
     /// The percentage is the backup stage's own, which is the only stage that
     /// reports one.
     private func elapsedText(_ seconds: Int) -> String {
-        let clock = "Elapsed \(seconds / 60)m \(seconds % 60)s"
+        let clock = "已用时 \(seconds / 60) 分 \(seconds % 60) 秒"
         guard let progress, !progress.isNaN else { return clock }
-        return "\(clock) · backup \(Int(progress))%"
+        return "\(clock) · 备份 \(Int(progress))%"
     }
 
     // MARK: - Connection
@@ -1350,7 +1350,7 @@ struct GoldenNuggetView: View {
                     // then back off, and stop at a hard deadline.
                     let readyStage = StageTimer("minimuxer readiness")
                     var isReady = false
-                    var readinessFailure = "Readiness check returned false"
+                    var readinessFailure = "就绪检查返回了 false"
                     let deadline = Date().addingTimeInterval(20)
                     var poll = 0
                     var delay: UInt64 = 200_000_000   // 0.2 s -> doubles -> 2 s cap

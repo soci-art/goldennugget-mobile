@@ -13,7 +13,7 @@ final class InFlightCall: @unchecked Sendable {
     enum Failure: Error, LocalizedError {
         case busy
         var errorDescription: String? {
-            "A previous device operation is still running. Wait for it to finish; if a cancelled operation remains blocked, restart the app before trying again."
+            "上一个设备操作还在运行。请等它完成；如果某个已取消的操作一直卡住，请重启应用后再试。"
         }
     }
 

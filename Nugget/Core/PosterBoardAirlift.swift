@@ -86,7 +86,7 @@ enum PosterBoardAirlift {
                 PosterBoard.convertLegacyPack(template.title, at: stage, log: log)
             }
         }
-        guard !sources.isEmpty else { throw GoldenNuggetError("No PosterBoard packs or templates to inject.") }
+        guard !sources.isEmpty else { throw GoldenNuggetError("没有可注入的 PosterBoard 包或模板。") }
 
         var container = cachedContainer
         if container.isEmpty {
@@ -141,8 +141,8 @@ enum PosterBoardAirlift {
                                                 defaultExtension: source.defaultExtension,
                                                 log: log)
                 guard !descriptors.isEmpty else {
-                    throw GoldenNuggetError("No wallpaper descriptors were found in \(source.name). "
-                        + "Use Protective backup for templates that deliver container files.")
+                    throw GoldenNuggetError("在 \(source.name) 中没有找到壁纸描述文件。"
+                        + "对于交付容器文件的模板，请使用「保护性备份」。")
                 }
                 log("  \(descriptors.count) descriptor(s)")
 
@@ -191,9 +191,9 @@ enum PosterBoardAirlift {
         }
 
         guard injected > 0 else {
-            throw GoldenNuggetError("No PosterBoard descriptor was injected. The device has to be "
-                + "unlocked with LocalDevVPN up; if it was, the cached container was stale and has "
-                + "been cleared for the next attempt.")
+            throw GoldenNuggetError("没有注入任何 PosterBoard 描述文件。设备必须"
+                + "保持解锁并让 LocalDevVPN 连通；如果当时已经解锁，那么缓存的容器信息已过期，并已"
+                + "为下一次尝试清除。")
         }
 
         log("Respring so PosterBoard re-reads the store…")
@@ -419,7 +419,7 @@ enum PosterBoardAirlift {
         guard let walker = FileManager.default.enumerator(
             at: folder, includingPropertiesForKeys: [.isRegularFileKey]
         ) else {
-            throw GoldenNuggetError("Could not read descriptor: \(folder.lastPathComponent)")
+            throw GoldenNuggetError("无法读取描述文件：\(folder.lastPathComponent)")
         }
 
         while let url = walker.nextObject() as? URL {

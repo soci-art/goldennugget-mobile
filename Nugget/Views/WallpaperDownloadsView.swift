@@ -233,7 +233,7 @@ struct WallpaperDownloadsView: View {
         loading = false
 
         if result.wallpapers.isEmpty {
-            status = result.failures.isEmpty ? "No wallpapers found" : "Failed to load wallpapers"
+            status = result.failures.isEmpty ? "没有找到壁纸" : "加载壁纸失败"
             statusTone = result.failures.isEmpty ? .secondary : .error
         } else {
             status = "\(result.wallpapers.count) 张壁纸"
@@ -273,7 +273,7 @@ struct WallpaperDownloadsView: View {
             do {
                 file = try await WallpaperCatalog.download(wallpaper)
             } catch {
-                fail("\(wallpaper.name) could not be downloaded: \(error.localizedDescription)")
+                fail("\(wallpaper.name) 无法下载：\(error.localizedDescription)")
                 return
             }
             do {
@@ -281,10 +281,10 @@ struct WallpaperDownloadsView: View {
                 let pack = try PosterBoardImports.import(from: file)
                 guard existing + pack.descriptorCount <= PosterBoardImports.descriptorLimit else {
                     PosterBoardImports.remove(pack)
-                    throw GoldenNuggetError("\(pack.name) carries \(pack.descriptorCount) "
-                        + "descriptor(s), which would take the selection to "
-                        + "\(existing + pack.descriptorCount). PosterBoard's picker gets "
-                        + "unusable past \(PosterBoardImports.descriptorLimit) — remove a pack "
+                    throw GoldenNuggetError("\(pack.name) 带有 \(pack.descriptorCount) 个"
+                        + "描述文件，选择后总数将达到 "
+                        + "\(existing + pack.descriptorCount) 个。PosterBoard 的选择器超过 "
+                        + "\(PosterBoardImports.descriptorLimit) 个就无法使用——请先移除一个包"
                         + "on the PosterBoard page first.")
                 }
                 selection.loadFromDisk()
@@ -298,7 +298,7 @@ struct WallpaperDownloadsView: View {
                     legacyPrompt = prompt
                 }
             } catch {
-                fail("Could not import \(wallpaper.name): \(error.localizedDescription)")
+                fail("无法导入 \(wallpaper.name)：\(error.localizedDescription)")
             }
             // The copy in `PosterBoardImports` is the one that is kept; this is
             // the transfer's scratch file, in the temporary directory.

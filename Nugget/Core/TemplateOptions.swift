@@ -54,7 +54,7 @@ struct TemplateOptionFields {
     ///   live in `options`), which is the one exception the reference carves out.
     init(_ data: [String: Any], kind: TemplateOptionKind, jsonPath: String) throws {
         guard let label = data["label"] as? String else {
-            throw TemplateFile.fail("An option in \(jsonPath) has no \"label\".")
+            throw TemplateFile.fail("\(jsonPath) 中的一个选项没有 \"label\"。")
         }
         self.kind = kind
         self.label = label
@@ -62,11 +62,11 @@ struct TemplateOptionFields {
             self.files = []
         } else {
             guard let files = data["files"] as? [String] else {
-                throw TemplateFile.fail("The \(kind.rawValue) option \"\(label)\" in \(jsonPath) "
-                    + "has no \"files\" list.")
+                throw TemplateFile.fail("\(jsonPath) 中的 \(kind.rawValue) 选项「\(label)」"
+                    + "没有 \"files\" 列表。")
             }
             guard files.allSatisfy({ TemplatePath.isSafe($0, allowLeadingSlash: true) }) else {
-                throw TemplateFile.fail("An option in \(jsonPath) has an unsafe file path.")
+                throw TemplateFile.fail("\(jsonPath) 中的一个选项含有不安全的文件路径。")
             }
             self.files = files
         }
@@ -118,13 +118,13 @@ struct ReplaceOption: TemplateOption {
         self.files = base.files
         self.associatedPreview = base.associatedPreview
         guard let allowed = data["allowed_files"] as? String else {
-            throw TemplateFile.fail("The replace option \"\(label)\" in \(jsonPath) has no "
-                + "\"allowed_files\".")
+            throw TemplateFile.fail("\(jsonPath) 中的替换选项「\(label)」没有"
+                + "\"allowed_files\"。")
         }
         self.allowedFiles = allowed
         // The reference's fallback button text is the filter itself; kept,
         // because it is what a user of the desktop build has read before.
-        self.buttonLabel = (data["button_label"] as? String) ?? "Import \(allowed)"
+        self.buttonLabel = (data["button_label"] as? String) ?? "导入 \(allowed)"
         self.required = (data["required"] as? Bool) ?? false
     }
 
@@ -148,7 +148,7 @@ struct ReplaceOption: TemplateOption {
     func apply(containerPath: URL) throws {
         guard let value else {
             if required {
-                throw TemplateFile.fail("This template cannot be applied yet: no file was chosen "
+                throw TemplateFile.fail("这个模板还不能应用：还没有为以下项选择文件："
                     + "for \"\(label)\".")
             }
             // Not required and nothing chosen: the target keeps the bytes the
@@ -159,15 +159,15 @@ struct ReplaceOption: TemplateOption {
         do {
             contents = try Data(contentsOf: value)
         } catch {
-            throw TemplateFile.fail("The file chosen for \"\(label)\" could not be read "
-                + "(\(value.lastPathComponent)): \(error.localizedDescription)")
+            throw TemplateFile.fail("为「\(label)」选择的文件无法读取"
+                + "（\(value.lastPathComponent)）：\(error.localizedDescription)")
         }
         for target in resolve(containerPath) {
             do {
                 try contents.write(to: target, options: .atomic)
             } catch {
-                throw TemplateFile.fail("Could not write \(target.lastPathComponent) for "
-                    + "\"\(label)\": \(error.localizedDescription)")
+                throw TemplateFile.fail("无法为以下操作写入 \(target.lastPathComponent)："
+                    + "「\(label)」：\(error.localizedDescription)")
             }
         }
     }
@@ -230,8 +230,8 @@ struct RemoveOption: TemplateOption {
                                                              useCAID: useCAID)
                     try edited.write(to: target, options: .atomic)
                 } catch {
-                    throw TemplateFile.fail("\(target.lastPathComponent) carries the identifier "
-                        + "\"\(identifier)\" but could not be edited: \(error.localizedDescription)")
+                    throw TemplateFile.fail("\(target.lastPathComponent) 带有标识符 "
+                        + "「\(identifier)」，但无法编辑：\(error.localizedDescription)")
                 }
                 continue
             }
@@ -250,8 +250,8 @@ struct RemoveOption: TemplateOption {
                     try fm.removeItem(at: target)
                 }
             } catch {
-                throw TemplateFile.fail("Could not remove \(target.lastPathComponent) for "
-                    + "\"\(label)\": \(error.localizedDescription)")
+                throw TemplateFile.fail("无法为以下操作移除 \(target.lastPathComponent)："
+                    + "「\(label)」：\(error.localizedDescription)")
             }
         }
     }
@@ -336,18 +336,18 @@ struct SetOption: TemplateOption {
         self.files = base.files
         self.associatedPreview = base.associatedPreview
         guard let identifier = data["identifier"] as? String else {
-            throw TemplateFile.fail("The set option \"\(label)\" in \(jsonPath) has no "
-                + "\"identifier\" — that is the nuggetId of the element to change.")
+            throw TemplateFile.fail("\(jsonPath) 中的设置选项「\(label)」没有"
+                + "\"identifier\"——那是要改的元素的 nuggetId。")
         }
         self.identifier = identifier
         guard let key = data["key"] as? String else {
-            throw TemplateFile.fail("The set option \"\(label)\" in \(jsonPath) has no \"key\".")
+            throw TemplateFile.fail("\(jsonPath) 中的设置选项「\(label)」没有 \"key\"。")
         }
         self.key = key
         guard let setterName = data["setter_type"] as? String,
               let setter = SetterType(rawValue: setterName) else {
-            throw TemplateFile.fail("The set option \"\(label)\" in \(jsonPath) needs a "
-                + "\"setter_type\" of textbox, slider, toggle or color_picker.")
+            throw TemplateFile.fail("\(jsonPath) 中的设置选项「\(label)」需要一个"
+                + "\"setter_type\"，其值须为 textbox、slider、toggle 或 color_picker。")
         }
         self.setter = setter
         self.useCAID = (data["use_ca_id"] as? Bool) ?? false
@@ -362,8 +362,8 @@ struct SetOption: TemplateOption {
         let rawMax = SetOption.numbers(data["max_value"])
         let rawStep = SetOption.numbers(data["step"]) ?? [1]
         guard setter != .slider || (rawMin != nil && rawMax != nil) else {
-            throw TemplateFile.fail("The slider option \"\(label)\" in \(jsonPath) needs both a "
-                + "\"min_value\" and a \"max_value\".")
+            throw TemplateFile.fail("\(jsonPath) 中的滑块选项「\(label)」需要同时有"
+                + "\"min_value\" 和 \"max_value\"。")
         }
         self.minValue = rawMin
         self.maxValue = rawMax
@@ -584,7 +584,7 @@ struct SetOption: TemplateOption {
                 do {
                     data = try Data(contentsOf: target)
                 } catch {
-                    throw TemplateFile.fail("\(name) could not be read for \"\(label)\": "
+                    throw TemplateFile.fail("\(name) 无法为「\(label)」读取："
                         + error.localizedDescription)
                 }
                 let keys = extraKey.map { [key, $0] } ?? [key]
@@ -595,8 +595,8 @@ struct SetOption: TemplateOption {
                                                            useCAID: useCAID)
                     try edited.write(to: target, options: .atomic)
                 } catch {
-                    throw TemplateFile.fail("\(name) carries the identifier \"\(identifier)\" "
-                        + "but could not be edited: \(error.localizedDescription)")
+                    throw TemplateFile.fail("\(name) 带有标识符「\(identifier)」"
+                        + "，但无法编辑：\(error.localizedDescription)")
                 }
             } else if name.hasSuffix(".plist") {
                 // `write_plist_value(file, key, value)`, recursive by default:
@@ -606,7 +606,7 @@ struct SetOption: TemplateOption {
                                                           value: written.plistValue, recursive: true)
                     try edited.write(to: target, options: .atomic)
                 } catch {
-                    throw TemplateFile.fail("\(name) could not be edited for \"\(label)\": "
+                    throw TemplateFile.fail("\(name) 无法为「\(label)」编辑："
                         + error.localizedDescription)
                 }
             } else {
@@ -665,8 +665,8 @@ struct PickerOption: TemplateOption {
         self.files = base.files
         self.associatedPreview = base.associatedPreview
         guard let rawChoices = data["options"] as? [[String: Any]], !rawChoices.isEmpty else {
-            throw TemplateFile.fail("The picker option \"\(label)\" in \(jsonPath) needs a "
-                + "non-empty \"options\" list.")
+            throw TemplateFile.fail("\(jsonPath) 中的选择器选项「\(label)」需要一个"
+                + "非空的 \"options\" 列表。")
         }
         // Built in a local and assigned after, because a closure that mentions
         // `self` at all — even to read `self.label` in an error message — is a
@@ -675,12 +675,12 @@ struct PickerOption: TemplateOption {
         let optionLabel = label
         let parsedChoices = try rawChoices.enumerated().map { index, choice in
             guard let choiceLabel = choice["label"] as? String else {
-                throw TemplateFile.fail("Choice \(index) of the picker \"\(optionLabel)\" in "
-                    + "\(jsonPath) has no \"label\".")
+                throw TemplateFile.fail("选择器「\(optionLabel)」的第 \(index) 个选项（位于"
+                    + "\(jsonPath)）没有 \"label\"。")
             }
             let files = (choice["files"] as? [String]) ?? []
             guard files.allSatisfy({ TemplatePath.isSafe($0, allowLeadingSlash: true) }) else {
-                throw TemplateFile.fail("The picker in \(jsonPath) has an unsafe file path.")
+                throw TemplateFile.fail("\(jsonPath) 中的选择器含有不安全的文件路径。")
             }
             return Choice(label: choiceLabel,
                           files: files,
@@ -691,11 +691,11 @@ struct PickerOption: TemplateOption {
         self.renames = (data["rename"] as? Bool) ?? false
         if renames {
             guard let names = data["names"] as? [String] else {
-                throw TemplateFile.fail("The picker option \"\(label)\" in \(jsonPath) sets "
-                    + "\"rename\" but has no \"names\" list to rename to.")
+                throw TemplateFile.fail("\(jsonPath) 中的选择器选项「\(label)」设置了"
+                    + "\"rename\"，但没有可重命名到的 \"names\" 列表。")
             }
             guard names.allSatisfy({ TemplatePath.isSafe($0) }) else {
-                throw TemplateFile.fail("The picker in \(jsonPath) has an unsafe rename destination.")
+                throw TemplateFile.fail("\(jsonPath) 中的选择器含有不安全的重命名目标。")
             }
             self.names = names
         } else {
@@ -751,21 +751,21 @@ struct PickerOption: TemplateOption {
         // partial rename would deliver a template with the wrong file names and
         // no error at all.
         guard names.count >= chosenFiles.count else {
-            throw TemplateFile.fail("The picker \"\(label)\" renames \(chosenFiles.count) file(s) "
-                + "but only names \(names.count).")
+            throw TemplateFile.fail("选择器「\(label)」会重命名 \(chosenFiles.count) 个文件"
+                + "，但只命名了 \(names.count) 个。")
         }
         for (index, pattern) in chosenFiles.enumerated() {
             for target in TemplateGlob.match(pattern, under: containerPath) {
                 guard let destination = TemplatePath.destination(names[index], under: containerPath) else {
-                    throw TemplateFile.fail("Unsafe picker rename destination: \(names[index])")
+                    throw TemplateFile.fail("不安全的选择器重命名目标：\(names[index])")
                 }
                 if target.standardizedFileURL == destination.standardizedFileURL { continue }
                 try? fm.removeItem(at: destination)
                 do {
                     try fm.moveItem(at: target, to: destination)
                 } catch {
-                    throw TemplateFile.fail("Could not rename \(target.lastPathComponent) to "
-                        + "\(names[index]) for \"\(label)\": \(error.localizedDescription)")
+                    throw TemplateFile.fail("无法把 \(target.lastPathComponent) 重命名为："
+                        + "「\(label)」的 \(names[index])：\(error.localizedDescription)")
                 }
             }
         }

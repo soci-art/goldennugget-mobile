@@ -71,7 +71,7 @@ enum CommunityCatalog {
             for raw in rows.prefix(2000) {
                 do {
                     let entry = try parseEntry(raw, template: isTemplate)
-                    guard seen.insert(entry.id).inserted else { throw CommunityError("Duplicate catalog entry.") }
+                    guard seen.insert(entry.id).inserted else { throw CommunityError("目录条目重复。") }
                     result.append(entry)
                 } catch { rejected += 1 }
             }
@@ -81,11 +81,11 @@ enum CommunityCatalog {
     }
     private static func parseEntry(_ raw: Any, template: Bool) throws -> Entry {
         guard let row = raw as? [String: Any], let id = row["id"] as? String,
-              matches(id, "^[a-z0-9][a-z0-9-]{1,47}$") else { throw CommunityError("Invalid catalog ID.") }
+              matches(id, "^[a-z0-9][a-z0-9-]{1,47}$") else { throw CommunityError("目录 ID 无效。") }
         func text(_ key: String, limit: Int, required: Bool = false) throws -> String {
             guard let value = (row[key] ?? "") as? String, value.count <= limit,
                   !required || !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                throw CommunityError("Invalid catalog text.")
+                throw CommunityError("目录文本无效。")
             }
             return value.trimmingCharacters(in: .whitespacesAndNewlines)
         }
@@ -94,39 +94,39 @@ enum CommunityCatalog {
         let detail = try text("description", limit: 500)
         guard let untested = (row["untested"] ?? false) as? NSNumber,
               CFGetTypeID(untested) == CFBooleanGetTypeID() else {
-            throw CommunityError("Catalog untested must be true or false.")
+            throw CommunityError("目录的 untested 必须是 true 或 false。")
         }
         let minimum = try text("ios_min", limit: 8), maximum = try text("ios_max", limit: 8)
         for version in [minimum, maximum] where !version.isEmpty {
-            guard matches(version, "^[0-9]{1,2}(\\.[0-9]{1,2}){0,2}$") else { throw CommunityError("Invalid iOS range.") }
+            guard matches(version, "^[0-9]{1,2}(\\.[0-9]{1,2}){0,2}$") else { throw CommunityError("iOS 版本范围无效。") }
         }
         if !minimum.isEmpty && !maximum.isEmpty && TweakVersion.compare(minimum, maximum) == 1 {
-            throw CommunityError("Invalid iOS range.")
+            throw CommunityError("iOS 版本范围无效。")
         }
         guard let tags = (row["tags"] ?? []) as? [String], tags.count <= 8,
-              tags.allSatisfy({ !$0.isEmpty && $0.count <= 24 }) else { throw CommunityError("Invalid catalog tags.") }
+              tags.allSatisfy({ !$0.isEmpty && $0.count <= 24 }) else { throw CommunityError("目录标签无效。") }
         var code: String?, size = 0, digest = "", writes: [String] = []
         if template {
             guard let bytes = row["size"] as? NSNumber, CFGetTypeID(bytes) != CFBooleanGetTypeID(),
                   bytes.doubleValue.rounded() == bytes.doubleValue, bytes.intValue > 0,
                   bytes.intValue <= 25 * 1024 * 1024, let sha = row["sha256"] as? String,
                   matches(sha, "^[0-9a-f]{64}$"), let tweaks = (row["tweaks"] ?? []) as? [[String: Any]] else {
-                throw CommunityError("Invalid template metadata.")
+                throw CommunityError("模板元数据无效。")
             }
             size = bytes.intValue; digest = sha
             for tweak in tweaks {
                 guard let label = tweak["label"] as? String, let paths = tweak["writes"] as? [String],
-                      paths.allSatisfy({ $0.count <= 1024 }) else { throw CommunityError("Invalid template paths.") }
+                      paths.allSatisfy({ $0.count <= 1024 }) else { throw CommunityError("模板路径无效。") }
                 writes += paths.map { "\(label.prefix(80)): \($0)" }
             }
-            guard writes.count <= 64 else { throw CommunityError("Too many template writes.") }
+            guard writes.count <= 64 else { throw CommunityError("模板写入次数过多。") }
         } else {
             guard let value = row["code"] as? String, value.hasPrefix("GN1."), value.count <= 6000 else {
-                throw CommunityError("Invalid preset code.")
+                throw CommunityError("预设码无效。")
             }
             let document = try PresetShareCode.decode(value)
             guard (document["tweaks"] as? [String: [String: Any]] ?? [:]).values.contains(where: { $0["enabled"] as? Bool == true }) else {
-                throw CommunityError("Preset contains no enabled tweaks.")
+                throw CommunityError("预设里没有已启用的调整。")
             }
             code = value
         }
@@ -141,10 +141,10 @@ enum CommunityCatalog {
         request.timeoutInterval = 30
         let (bytes, response) = try await URLSession.shared.bytes(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200,
-              response.expectedContentLength <= Int64(limit) else { throw CommunityError("Catalog download failed.") }
+              response.expectedContentLength <= Int64(limit) else { throw CommunityError("目录下载失败。") }
         var data = Data()
         for try await byte in bytes {
-            guard data.count < limit else { throw CommunityError("Download exceeds its size limit.") }
+            guard data.count < limit else { throw CommunityError("下载内容超过大小上限。") }
             data.append(byte)
         }
         return data
@@ -180,7 +180,7 @@ enum CommunityCatalog {
         return digest.map { $0 == entry.fingerprint ? "Installed" : "Update available" }
     }
     static func installPreset(_ entry: Entry) throws -> String {
-        guard let code = entry.code else { throw CommunityError("This entry is a template.") }
+        guard let code = entry.code else { throw CommunityError("这个条目是一个模板。") }
         var document = try PresetShareCode.decode(code)
         var meta = document["metadata"] as? [String: Any] ?? [:]
         meta["catalog"] = ["id": entry.id, "sha256": entry.fingerprint]

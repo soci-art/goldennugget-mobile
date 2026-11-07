@@ -4,7 +4,8 @@
 
 ## 汉化范围
 
-- 界面文案目录 `Localizable.xcstrings` / `InfoPlist.xcstrings`：527 条全部译为简体中文
+- 界面文案目录 `Localizable.xcstrings` / `InfoPlist.xcstrings`：583 条全部译为简体中文（上游原有 527 条 + 补齐上游目录遗漏的 56 条）
+- 目录之外的用户可见文案（状态、提示、错误说明等）已全量原地翻译；仅运行日志与诊断读数保留英文
 - 调整页目录（`TweakCatalog.swift`）：258 条调整的标题、说明、警告原文替换为中文
 - 守护进程页（`TweakCatalogDaemons.swift`）：53 组的标题与说明原文替换为中文
 - 各页面状态消息 27 条原文替换为中文

@@ -15,7 +15,7 @@ enum GoldenNuggetPresets {
     static func attachTemplates(_ entry: [String: Any], to name: String) throws {
         let file = fileURL(for: name)
         guard var document = try JSONSerialization.jsonObject(with: Data(contentsOf: file)) as? [String: Any] else {
-            throw GoldenNuggetError("Cannot read the saved preset.")
+            throw GoldenNuggetError("无法读取已保存的预设。")
         }
         var tweaks = document["tweaks"] as? [String: Any] ?? [:]
         tweaks["Templates"] = entry; document["tweaks"] = tweaks

@@ -153,7 +153,7 @@ enum TemplateXML {
             } else if scanner.consume("<?") {
                 let start = scanner.index
                 guard scanner.consumeUntil("?>") else {
-                    throw ParseError(reason: "a processing instruction is never closed.")
+                    throw ParseError(reason: "有一条处理指令从未闭合。")
                 }
                 root.content.append(.raw(scanner.text(from: start)))
             } else {
@@ -162,8 +162,8 @@ enum TemplateXML {
             scanner.skipWhitespace()
         }
         guard scanner.isAtEnd else {
-            throw ParseError(reason: "the XML has content after the root element "
-                + "(\"\(scanner.rest.prefix(40))\"), which this editor will not guess at.")
+            throw ParseError(reason: "XML 在根元素之后还有内容："
+                + "（「\(scanner.rest.prefix(40))」），本编辑器不会去猜它。")
         }
         return Document(declaration: declaration, root: root)
     }
@@ -242,7 +242,7 @@ enum TemplateXML {
             guard let semicolon = tail.firstIndex(of: ";") else {
                 // A bare `&` is what a hand-edited file has; `ElementTree` refuses
                 // it, and so does this, one layer up.
-                throw ParseError(reason: "the XML has a `&` that does not start an entity.")
+                throw ParseError(reason: "XML 中有一个 `&` 并不起始一个实体。")
             }
             let entity = tail[tail.startIndex..<semicolon]
             switch entity {
@@ -261,8 +261,8 @@ enum TemplateXML {
                           let scalar = Unicode.Scalar(code) {
                     out.append(Character(scalar))
                 } else {
-                    throw ParseError(reason: "the XML uses the entity `&\(entity);`, "
-                        + "which this editor does not know.")
+                    throw ParseError(reason: "XML 使用了实体 `&\(entity);`，"
+                        + "，本编辑器不认识它。")
                 }
             }
             rest = tail[tail.index(after: semicolon)...]
@@ -427,16 +427,16 @@ enum TemplateXML {
             if let components {
                 for (name, component) in zip(["x", "y", "z", "a"], components) {
                     guard let number = Double(component) else {
-                        throw ParseError(reason: "a `nuggetOffset` needs numbers, and "
-                            + "\"\(component)\" is not one.")
+                        throw ParseError(reason: "一个 `nuggetOffset` 需要数字，而"
+                            + "「\(component)」不是其中之一。")
                     }
                     mapped[name] = number
                 }
             } else if let number = Double(value) {
                 mapped["x"] = number
             } else {
-                throw ParseError(reason: "a `nuggetOffset` needs a numeric value, and "
-                    + "\"\(value)\" is not one.")
+                throw ParseError(reason: "一个 `nuggetOffset` 需要一个数值，而"
+                    + "「\(value)」不是其中之一。")
             }
 
             let results = try equations.map { try OffsetEquation.evaluate($0, mapped) }
@@ -459,8 +459,8 @@ enum TemplateXML {
             let value = try parser.parseExpression()
             parser.skipSpaces()
             guard parser.isAtEnd else {
-                throw ParseError(reason: "the `nuggetOffset` expression "
-                    + "\"\(expression)\" has trailing content this editor cannot parse.")
+                throw ParseError(reason: "`nuggetOffset` 表达式 "
+                    + "「\(expression)」末尾有多余内容，本编辑器无法解析。")
             }
             return value
         }
@@ -513,14 +513,14 @@ enum TemplateXML {
                         index += 1
                         let divisor = try parseUnary()
                         guard divisor != 0 else {
-                            throw ParseError(reason: "a `nuggetOffset` divides by zero.")
+                            throw ParseError(reason: "一个 `nuggetOffset` 发生了除以零。")
                         }
                         value /= divisor
                     case 0x25:                    // %
                         index += 1
                         let divisor = try parseUnary()
                         guard divisor != 0 else {
-                            throw ParseError(reason: "a `nuggetOffset` takes a modulus of zero.")
+                            throw ParseError(reason: "一个 `nuggetOffset` 对零取了模。")
                         }
                         value = value.truncatingRemainder(dividingBy: divisor)
                     default:
@@ -532,8 +532,8 @@ enum TemplateXML {
             mutating func parseUnary() throws -> Double {
                 skipSpaces()
                 guard index < bytes.count else {
-                    throw ParseError(reason: "a `nuggetOffset` expression ends where a value "
-                        + "should be.")
+                    throw ParseError(reason: "一个 `nuggetOffset` 表达式在期望值出现的位置结束了"
+                        + "应有的样子。")
                 }
                 if bytes[index] == 0x2D {          // -
                     index += 1
@@ -560,15 +560,15 @@ enum TemplateXML {
             mutating func parseAtom() throws -> Double {
                 skipSpaces()
                 guard index < bytes.count else {
-                    throw ParseError(reason: "a `nuggetOffset` expression ends where a value "
-                        + "should be.")
+                    throw ParseError(reason: "一个 `nuggetOffset` 表达式在期望值出现的位置结束了"
+                        + "应有的样子。")
                 }
                 if bytes[index] == 0x28 {          // (
                     index += 1
                     let value = try parseExpression()
                     skipSpaces()
                     guard index < bytes.count, bytes[index] == 0x29 else {
-                        throw ParseError(reason: "a `nuggetOffset` opens a parenthesis it never closes.")
+                        throw ParseError(reason: "一个 `nuggetOffset` 打开了一个从未闭合的括号。")
                     }
                     index += 1
                     return value
@@ -582,15 +582,15 @@ enum TemplateXML {
                     let name = String(UnicodeScalar(bytes[index]))
                     index += 1
                     guard let value = variables[name] else {
-                        throw ParseError(reason: "the `nuggetOffset` uses \(name), but the value "
-                            + "it offsets has no \(name) component.")
+                        throw ParseError(reason: "`nuggetOffset` 使用了 \(name)，但该值"
+                            + "它偏移的对象没有 \(name) 分量。")
                     }
                     return value
                 }
                 let text = String(decoding: bytes[index...].prefix(16), as: UTF8.self)
-                let quoted = text.isEmpty ? "an end of input" : "\"\(text)\""
-                throw ParseError(reason: "a `nuggetOffset` contains \(quoted), which is not a "
-                    + "number, a variable or an operator.")
+                let quoted = text.isEmpty ? "输入结束" : "\"\(text)\""
+                throw ParseError(reason: "一个 `nuggetOffset` 含有 \(quoted)，它不是"
+                    + "数字、变量或运算符。")
             }
 
             mutating func parseNumber() throws -> Double {
@@ -613,7 +613,7 @@ enum TemplateXML {
                 }
                 let text = String(decoding: bytes[start..<index], as: UTF8.self)
                 guard let value = Double(text) else {
-                    throw ParseError(reason: "\"\(text)\" is not a number.")
+                    throw ParseError(reason: "「\(text)」不是数字。")
                 }
                 return value
             }

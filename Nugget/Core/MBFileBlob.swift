@@ -331,7 +331,7 @@ func patchMBFileContents(_ donor: Data, contents: Data) throws -> Data {
     guard var plist = try PropertyListSerialization.propertyList(from: donor, format: nil) as? [String: Any],
           var objects = plist["$objects"] as? [Any], objects.count > 1,
           var root = objects[1] as? [String: Any], root["Size"] != nil else {
-        throw MBFileMetadataError("PosterBoard native file metadata could not be read; restore stopped.")
+        throw MBFileMetadataError("无法读取 PosterBoard 原生文件元数据；恢复已停止。")
     }
     root["Size"] = contents.count
     if let digest = root["Digest"] {
@@ -339,7 +339,7 @@ func patchMBFileContents(_ donor: Data, contents: Data) throws -> Data {
         let value = Mirror(reflecting: digest).children.first(where: { $0.label == "value" })?.value
         let index = (value as? NSNumber)?.intValue ?? (value as? UInt32).map(Int.init) ?? (value as? Int)
         guard let index, objects.indices.contains(index), objects[index] is Data else {
-            throw MBFileMetadataError("PosterBoard native digest metadata could not be read.")
+            throw MBFileMetadataError("无法读取 PosterBoard 原生摘要元数据。")
         }
         objects[index] = payloadDigest(contents)
     }

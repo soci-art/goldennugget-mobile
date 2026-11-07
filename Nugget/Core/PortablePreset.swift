@@ -14,7 +14,7 @@ enum PortablePreset {
             let file = URL(fileURLWithPath: path)
             let values = try file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey])
             guard values.isRegularFile == true, values.isSymbolicLink != true, (values.fileSize ?? Int.max) <= 64 * 1024 * 1024 else {
-                throw CommunityError("Missing, linked or oversized preset asset.")
+                throw CommunityError("预设资源缺失、被链接或过大。")
             }
             let bytes = try Data(contentsOf: file)
             let digest = CommunityCatalog.hash(bytes)
@@ -37,7 +37,7 @@ enum PortablePreset {
         document["tweaks"] = tweaks
         let manifest = try JSONSerialization.data(withJSONObject: ["format": format, "version": 1, "preset": document, "assets": assets], options: [.sortedKeys])
         guard manifest.count <= 4 * 1024 * 1024, data.values.reduce(0, { $0 + $1.count }) <= 256 * 1024 * 1024 else {
-            throw CommunityError("Portable preset exceeds its size limit.")
+            throw CommunityError("便携预设超过大小上限。")
         }
         let temporary = destination.deletingLastPathComponent().appendingPathComponent(UUID().uuidString + ".zip")
         defer { try? FileManager.default.removeItem(at: temporary) }
@@ -66,21 +66,21 @@ enum PortablePreset {
         for entry in archive {
             guard entry.type == .file, CommunityTemplate.relativePath(entry.path), entries[entry.path] == nil,
                   entries.count < 4096, entry.uncompressedSize <= 64 * 1024 * 1024 else {
-                throw CommunityError("Unsafe portable preset archive.")
+                throw CommunityError("不安全的便携预设归档。")
             }
             total += UInt64(entry.uncompressedSize)
-            guard total <= 256 * 1024 * 1024 else { throw CommunityError("Portable preset expands beyond 256 MB.") }
+            guard total <= 256 * 1024 * 1024 else { throw CommunityError("便携预设解开后超过 256 MB。") }
             entries[entry.path] = entry
         }
         func read(_ path: String, limit: Int) throws -> Data {
-            guard let entry = entries[path], entry.uncompressedSize <= limit else { throw CommunityError("Missing or oversized preset asset.") }
+            guard let entry = entries[path], entry.uncompressedSize <= limit else { throw CommunityError("预设资源缺失或过大。") }
             var bytes = Data()
             let checksum = try archive.extract(entry) { chunk in
-                guard bytes.count + chunk.count <= limit else { throw CommunityError("Oversized preset asset.") }
+                guard bytes.count + chunk.count <= limit else { throw CommunityError("预设资源过大。") }
                 bytes.append(chunk)
             }
             guard checksum == entry.checksum, bytes.count == Int(entry.uncompressedSize) else {
-                throw CommunityError("Corrupt portable preset entry.")
+                throw CommunityError("便携预设条目已损坏。")
             }
             return bytes
         }
@@ -89,7 +89,7 @@ enum PortablePreset {
               var document = manifest["preset"] as? [String: Any], GoldenNuggetPresets.isValidImport(document),
               let assets = manifest["assets"] as? [String: [String: Any]],
               Set(entries.keys) == Set(assets.keys).union(["manifest.json"]) else {
-            throw CommunityError("Invalid portable preset manifest.")
+            throw CommunityError("便携预设清单无效。")
         }
         let owned = CommunityCatalog.directory.appendingPathComponent("imports/" + UUID().uuidString, isDirectory: true)
         var success = false
@@ -100,10 +100,10 @@ enum PortablePreset {
             guard name.hasPrefix("assets/"), CommunityTemplate.relativePath(name),
                   let size = asset["size"] as? Int, size >= 0, size <= 64 * 1024 * 1024,
                   let sha = asset["sha256"] as? String, CommunityCatalog.matches(sha, "^[0-9a-f]{64}$") else {
-                throw CommunityError("Invalid portable preset asset metadata.")
+                throw CommunityError("便携预设资源元数据无效。")
             }
             let data = try read(name, limit: 64 * 1024 * 1024)
-            guard data.count == size, CommunityCatalog.hash(data) == sha else { throw CommunityError("Portable preset asset checksum mismatch.") }
+            guard data.count == size, CommunityCatalog.hash(data) == sha else { throw CommunityError("便携预设资源校验和不匹配。") }
             let file = owned.appendingPathComponent(name)
             try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
             try data.write(to: file, options: .atomic)
@@ -111,7 +111,7 @@ enum PortablePreset {
         }
         var used = Set<String>()
         func resolve(_ value: Any) throws -> String {
-            guard let ref = value as? String, let path = resolved[ref] else { throw CommunityError("Preset references an undeclared asset.") }
+            guard let ref = value as? String, let path = resolved[ref] else { throw CommunityError("预设引用了未声明的资源。") }
             used.insert(ref)
             return path
         }
@@ -128,7 +128,7 @@ enum PortablePreset {
             }
             tweaks["IconThemes"] = icons
         }
-        guard used == Set(resolved.keys) else { throw CommunityError("Preset contains unused assets.") }
+        guard used == Set(resolved.keys) else { throw CommunityError("预设里含有未使用的资源。") }
         document["tweaks"] = tweaks
         success = true
         return (document, owned)

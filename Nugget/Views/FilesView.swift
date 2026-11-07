@@ -66,9 +66,9 @@ struct FilesView: View {
 
         var title: String {
             switch self {
-            case .name: "Name"
-            case .size: "Size"
-            case .date: "Date"
+            case .name: "名称"
+            case .size: "大小"
+            case .date: "日期"
             }
         }
 
@@ -501,7 +501,7 @@ struct FilesView: View {
         HStack(spacing: 8) {
             Image(systemName: "internaldrive")
                 .foregroundStyle(.secondary)
-            Text("\(AfcFileExplorer.format(volume.freeBytes)) free of "
+            Text("可用空间 \(AfcFileExplorer.format(volume.freeBytes))，总共 "
                  + "\(AfcFileExplorer.format(volume.totalBytes))")
                 .font(.caption)
                 .foregroundStyle(.secondary)

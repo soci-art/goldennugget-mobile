@@ -74,7 +74,7 @@ struct PasscodeThemeView: View {
                       systemImage: "square.and.arrow.down")
             }
             if let theme {
-                NativeNote(String(localized: "\(theme.name) — \(theme.fileCount) file(s), \(theme.keysPreview.count) key(s) found."))
+                NativeNote(String(localized: "\(theme.name) —— \(theme.fileCount) 个文件，找到 \(theme.keysPreview.count) 个按键。"))
             }
         }
     }

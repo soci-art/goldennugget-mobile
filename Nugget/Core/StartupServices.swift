@@ -6,7 +6,7 @@ import Combine
 enum RemoteMetadataError: LocalizedError {
     case httpStatus(Int)
     var errorDescription: String? {
-        switch self { case .httpStatus(let code): return "The server returned HTTP \(code)." }
+        switch self { case .httpStatus(let code): return "服务器返回了 HTTP \(code)。" }
     }
 }
 

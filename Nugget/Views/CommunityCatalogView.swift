@@ -15,7 +15,7 @@ struct CommunityCatalogView: View {
     @State private var busy: String?
     @State private var message = ""
     @State private var code = ""
-    @State private var codeName = "Shared preset"
+    @State private var codeName = "共享预设"
     @State private var showImporter = false
     @State private var showCode = false
     @State private var sharedCode = ""
@@ -180,8 +180,8 @@ struct CommunityCatalogView: View {
             let index = try await CommunityCatalog.fetch()
             entries = index.entries
             message = "\(entries.count) 个条目。已跳过 \(index.rejected) 个无效条目。"
-                + " \(entries.filter { CommunityCatalog.status($0) == "Update available" }.count) updates available."
-                + (index.cached ? " Showing the offline cache." : "")
+                + " \(entries.filter { CommunityCatalog.status($0) == "Update available" 个有可用更新。"
+                + (index.cached ? " 正在显示离线缓存。" : "")
         } catch { message = error.localizedDescription }
     }
     private func install(_ entry: CommunityCatalog.Entry) async {
@@ -228,7 +228,7 @@ struct CommunityCatalogView: View {
     private func share(_ name: String) {
         do {
             let raw = try Data(contentsOf: GoldenNuggetPresets.fileURL(for: name))
-            guard let document = try JSONSerialization.jsonObject(with: raw) as? [String: Any] else { throw CommunityError("Invalid preset.") }
+            guard let document = try JSONSerialization.jsonObject(with: raw) as? [String: Any] else { throw CommunityError("预设无效。") }
             sharedCode = try PresetShareCode.encode(document, name: name)
             showCode = true
         } catch { message = error.localizedDescription }

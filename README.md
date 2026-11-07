@@ -182,9 +182,9 @@ HotLoad 会缓存移动端安全规则以供离线使用。设置中包含它的
 
 本仓库是 **GoldenNugget** 的 fork（原项目：[GoldenNugget-Team/GoldenNugget-mobile](https://github.com/GoldenNugget-Team/GoldenNugget-mobile)，桌面版：[awesomenull-dev/GoldenNugget](https://github.com/awesomenull-dev/GoldenNugget)），于 2026-11-07 加入了完整的简体中文 (zh-Hans) 汉化：
 
-- `Localizable.xcstrings` / `InfoPlist.xcstrings`：全部 527 条界面文案的 zh-Hans 翻译。
+- `Localizable.xcstrings` / `InfoPlist.xcstrings`：界面文案的 zh-Hans 翻译共 583 条（上游原有 527 条，另补齐上游目录遗漏的 56 条）。
 - 调整与守护进程目录（`TweakCatalog.swift`、`TweakCatalogDaemons.swift`）：标题、说明、警告和分区名称均已原地翻译。
-- 一批视图状态文案已原地翻译。
+- 目录之外的用户可见文案已全量汉化：各页状态与提示、预设与模板导入导出信息、全部错误说明（含传输失败的详细解释）、配对与隧道状态等均已原地翻译；核查标准是除运行日志与诊断读数外不留英文。
 - 构建配置：`knownRegions`（project.yml）和 xtool 资源列表（xtool.yml）中加入 `zh-Hans`。
 
 功能没有任何改动。所有致谢与 GPLv3 许可证均按上游保留。

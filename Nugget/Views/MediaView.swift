@@ -102,7 +102,7 @@ struct MediaView: View {
                     await run {
                         try AfcMediaBackup.clear()
                         loadManifest()
-                        lines.append("Local media store emptied.")
+                        lines.append("本地媒体库已清空。")
                     }
                 }
             } label: {
@@ -117,10 +117,10 @@ struct MediaView: View {
     private var surveyRows: some View {
         if let survey {
             VStack(alignment: .leading, spacing: 4) {
-                (Text("\(survey.files.count) file(s), \(bytes(survey.bytes))")
+                (Text("\(survey.files.count) 个文件，\(bytes(survey.bytes))")
                     + (survey.skippedSymlinks > 0 ? Text(", \(survey.skippedSymlinks) symlink(s) skipped") : Text(verbatim: "")))
                     .font(.body)
-                NativeNote("Free in the container: \(bytes(free)).")
+                NativeNote("容器中的可用空间：\(bytes(free))。")
             }
         } else {
             Text("Not surveyed")
@@ -168,7 +168,7 @@ struct MediaView: View {
         await run {
             let s = try await AfcMediaBackup.survey()
             survey = s
-            lines = ["Survey: \(s.files.count) file(s), \(bytes(s.bytes))."]
+            lines = ["清点：\(s.files.count) 个文件，\(bytes(s.bytes))。"]
         }
     }
 
@@ -187,7 +187,7 @@ struct MediaView: View {
             // recomputed here — `loadManifest()` is not called on this path.
             hasStoredFiles = storeHasFiles()
             let removed = m.entries.filter(\.deleted).count
-            lines.append("Store contains \(m.entries.count) file(s); \(removed) original(s) removed across saved transfers.")
+            lines.append("库中共有 \(m.entries.count) 个文件；历次保存的传输共移除了 \(removed) 个原文件。")
         }
     }
 

@@ -44,7 +44,7 @@ enum ProtectiveBackup {
             // (Socket(... BrokenPipe, channel closed))").  Retry with escalating
             // recovery instead of aborting.
             try await ChannelRecovery.retry(
-                label: "protective backup",
+                label: "保护性备份",
                 attempts: 3,
                 diagnostics: { await Diagnostics.report() },
                 // Wipe ONLY on the first attempt.  The device decides what to
@@ -83,7 +83,7 @@ enum ProtectiveBackup {
                 // attempt on the baseline already on disk beats more waiting — and
                 // the run can be stopped by hand at any point anyway.
                 try await StallGuard.run(
-                    label: "protective backup",
+                    label: "保护性备份",
                     idleSeconds: 120,
                     idle: { trace.lastActivityAt },
                     wire: { WireCensus.totals() },
@@ -168,7 +168,7 @@ enum ProtectiveBackup {
                 }
                 beat.stop()
                 stage.done("FAILED — kept 0 files")
-                throw GoldenNuggetError("Protective backup kept no files: \(cause). "
+                throw GoldenNuggetError("保护性备份没有留下任何文件：\(cause)。"
                     + "Domains: \(trace.domainSummary())")
             }
             AppLog.write("protective backup finished — \(trace.summary())")

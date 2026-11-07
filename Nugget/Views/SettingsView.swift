@@ -106,7 +106,7 @@ struct SettingsView: View {
 
             // A credit, not a setting: centred and on its own, so it does not
             // read as a row.
-            Text("Made with ❤️ by\nGoldenNugget Development Team")
+            Text("GoldenNugget Development Team 用 ❤️ 制作")
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)

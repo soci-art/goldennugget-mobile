@@ -111,8 +111,8 @@ struct PosterBoardTendie: Identifiable, Hashable {
         do {
             archive = try Archive(url: url, accessMode: .read)
         } catch {
-            throw GoldenNuggetError("\(url.lastPathComponent) is not a readable .tendies "
-                + "archive: \(error.localizedDescription)")
+            throw GoldenNuggetError("\(url.lastPathComponent) 不是可读的 .tendies 文件："
+                + "归档：\(error.localizedDescription)")
         }
 
         var descriptors = 0
@@ -162,7 +162,7 @@ struct PosterBoardTendie: Identifiable, Hashable {
         }
 
         if descriptors == 0 && !container {
-            throw GoldenNuggetError("\(url.lastPathComponent) holds no descriptor and no "
+            throw GoldenNuggetError("\(url.lastPathComponent) 里既没有描述文件也没有"
                 + "container — it does not look like a .tendies pack.")
         }
         self.descriptorCount = descriptors
@@ -256,12 +256,12 @@ struct PosterBoardTendie: Identifiable, Hashable {
             let relative = entry.path
             guard !relative.hasPrefix("/"),
                   !relative.split(separator: "/").contains("..") else {
-                throw GoldenNuggetError("\(name): the archive holds an entry that escapes the "
+                throw GoldenNuggetError("\(name)：归档里有一个条目会逃出以下目录："
                     + "extraction directory (\(relative)).")
             }
             let target = URL(fileURLWithPath: root + "/" + relative)
             guard target.standardizedFileURL.path.hasPrefix(root) else {
-                throw GoldenNuggetError("\(name): refusing to write \(relative) outside the "
+                throw GoldenNuggetError("\(name)：拒绝把 \(relative) 写到以下位置之外："
                     + "extraction directory.")
             }
             // A directory entry can legitimately be repeated or already exist
@@ -348,7 +348,7 @@ enum PosterBoardImports {
         do {
             try FileManager.default.copyItem(at: source, to: destination)
         } catch {
-            throw GoldenNuggetError("Could not copy \(source.lastPathComponent) into the app: "
+            throw GoldenNuggetError("无法把 \(source.lastPathComponent) 拷贝进应用："
                 + error.localizedDescription)
         }
         do {

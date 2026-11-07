@@ -415,10 +415,10 @@ extension PosterBoard {
         let stagedItems = builder.configs
         if database == nil && !stagedItems.isEmpty {
             throw GoldenNuggetError(
-                "PosterBoard has no database to add these wallpapers to. Fetch the device's "
-                + "PosterBoard database first (the page's database card) — the store's "
-                + "database is what makes a wallpaper appear in the picker, and it cannot be "
-                + "synthesised: it carries the device's own row set.")
+                "PosterBoard 没有可把这些壁纸加进去的数据库。请先获取设备的"
+                + "PosterBoard 数据库（该页的数据库卡片）——库的"
+                + "数据库决定了壁纸是否出现在选择器中，而且它无法"
+                + "合成：它带着设备自己的数据行集合。")
         }
         if let database {
             let staged = try PosterBoardStore.stitch(database: database,
@@ -519,14 +519,14 @@ extension PosterBoard {
         // not a stricter one.  Guessing "not 26.4" would silently write a
         // smaller plist than a 26.4+ device needs.
         guard let atLeast264 = compareVersion(deviceVersion, "26.4") else {
-            throw GoldenNuggetError("PosterBoard needs the device's iOS version to decide which "
-                + "reset preferences to write (26.4 added two migration lists), and "
-                + "\"\(deviceVersion)\" is not a version. Read the device identity and try again.")
+            throw GoldenNuggetError("PosterBoard 需要设备的 iOS 版本来决定使用哪种"
+                + "要写入的重置偏好（26.4 新增了两个迁移列表），而且"
+                + "「\(deviceVersion)」不是一个版本号。请读取设备身份后重试。")
         }
         var plist: [String: Any] = [:]
         if let existing {
             guard let decoded = try PropertyListSerialization.propertyList(from: existing, format: nil) as? [String: Any] else {
-                throw GoldenNuggetError("The live PosterBoard preferences are not a dictionary; apply stopped to preserve them.")
+                throw GoldenNuggetError("实时 PosterBoard 偏好不是字典；应用已停止以保留它们。")
             }
             plist = decoded
         }
@@ -731,9 +731,9 @@ private struct PosterBoardBuilder {
                     // has that shape.
                     let components = restorePath.components(separatedBy: "/")
                     guard components.count > 6 else {
-                        throw GoldenNuggetError("PosterBoard: cannot read the provider "
-                            + "extension out of \(restorePath) — the descriptor was routed "
-                            + "to an unexpected place.")
+                        throw GoldenNuggetError("PosterBoard：无法读取提供方："
+                            + "扩展名从 \(restorePath) 中剥离——描述文件被送到了"
+                            + "意料之外的地方。")
                     }
                     configs.append(PosterBoardConfigItem(uuid: folderName,
                                                          extensionID: components[6],
@@ -957,7 +957,7 @@ extension PosterBoard {
         do {
             try fm.copyItem(at: source, to: destination)
         } catch {
-            throw GoldenNuggetError("Could not copy \(source.lastPathComponent) into the app: "
+            throw GoldenNuggetError("无法把 \(source.lastPathComponent) 拷贝进应用："
                 + error.localizedDescription)
         }
         return destination
@@ -983,7 +983,7 @@ enum PosterBoardPlist {
         let data = try Data(contentsOf: url)
         let object = try PropertyListSerialization.propertyList(from: data, options: [], format: nil)
         guard let plist = object as? [String: Any] else {
-            throw GoldenNuggetError("\(url.lastPathComponent) is a plist but not a dictionary.")
+            throw GoldenNuggetError("\(url.lastPathComponent) 是 plist 但不是字典。")
         }
         return plist
     }
@@ -1034,7 +1034,7 @@ enum PosterBoardPlist {
     static func alignedForFamily(_ data: Data) throws -> Data {
         let object = try PropertyListSerialization.propertyList(from: data, options: [], format: nil)
         guard var plist = object as? [String: Any] else {
-            throw GoldenNuggetError("Wallpaper.plist is not a dictionary.")
+            throw GoldenNuggetError("Wallpaper.plist 不是字典。")
         }
         let newIdentifier = plist["identifier"]
         if let assets = plist["assets"] as? [String: Any],

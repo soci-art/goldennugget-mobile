@@ -497,7 +497,7 @@ enum StatusBarArchiveError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notAnArchive:
-            return "That payload is not a usable status bar override archive."
+            return "该载荷不是可用的状态栏覆盖归档。"
         }
     }
 }

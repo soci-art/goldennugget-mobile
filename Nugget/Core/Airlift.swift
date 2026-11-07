@@ -173,7 +173,7 @@ enum Airlift {
             let rc = al_exploit_write_dir(pairingPath, sourceDir, targetDir,
                                           logTrampoline, nil, &outError)
             guard rc == 0 else {
-                throw GoldenNuggetError(take(outError) ?? "AirLift directory write returned \(rc).")
+                throw GoldenNuggetError(take(outError) ?? "AirLift 目录写入返回了 \(rc)。")
             }
         }
     }
@@ -190,7 +190,7 @@ enum Airlift {
             let rc = al_exploit_inject_folder(pairingPath, folderPath, targetParentDir, destName,
                                               logTrampoline, nil, &outError)
             guard rc == 0 else {
-                throw GoldenNuggetError(take(outError) ?? "AirLift folder injection returned \(rc).")
+                throw GoldenNuggetError(take(outError) ?? "AirLift 文件夹注入返回了 \(rc)。")
             }
         }
     }
@@ -210,7 +210,7 @@ enum Airlift {
             let container = take(outContainer)
             let message = take(outError)
             guard rc == 0, let container else {
-                throw GoldenNuggetError(message ?? "No container for \(bundleID) (code \(rc)).")
+                throw GoldenNuggetError(message ?? "找不到 \(bundleID) 的容器（代码 \(rc)）。")
             }
             return container
         }
@@ -230,7 +230,7 @@ enum Airlift {
     static func respring() async throws {
         let attached = await MainActor.run { NeoSpring.trigger() }
         guard attached else {
-            throw GoldenNuggetError("There is no window to respring from. Leave the app in the "
+            throw GoldenNuggetError("没有可用来注销的窗口。请把应用留在"
                 + "foreground and run it again.")
         }
         // Give WebKit the moment it needs to load the payload. Returning
@@ -252,7 +252,7 @@ enum Airlift {
             var outError: UnsafeMutablePointer<CChar>?
             let rc = al_device_respring(pairingPath, logTrampoline, nil, &outError)
             guard rc == 0 else {
-                throw GoldenNuggetError(take(outError) ?? "Reboot returned \(rc).")
+                throw GoldenNuggetError(take(outError) ?? "重启返回了 \(rc)。")
             }
         }
     }
@@ -327,7 +327,7 @@ enum Airlift {
     static func extractPassthm(archivePath: String, destDir: String) async throws -> String {
         try await offMainActor {
             let rc = al_passthm_extract(archivePath, destDir)
-            guard rc == 0 else { throw GoldenNuggetError("Could not unpack \(archivePath) (code \(rc)).") }
+            guard rc == 0 else { throw GoldenNuggetError("无法解包 \(archivePath)（代码 \(rc)）。") }
         }
         return destDir
     }
@@ -338,7 +338,7 @@ enum Airlift {
     static func extractZip(archivePath: String, destDir: String) async throws -> String {
         try await offMainActor {
             let rc = al_zip_extract_all(archivePath, destDir)
-            guard rc == 0 else { throw GoldenNuggetError("Could not unpack \(archivePath) (code \(rc)).") }
+            guard rc == 0 else { throw GoldenNuggetError("无法解包 \(archivePath)（代码 \(rc)）。") }
         }
         return destDir
     }

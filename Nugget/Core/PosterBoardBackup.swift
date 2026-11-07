@@ -77,11 +77,11 @@ enum PosterBoardBackup {
         // about a second, and this is the one precondition worth asserting.
         guard !container.isEmpty else {
             throw GoldenNuggetError(
-                "The device's own record for \(PosterBoard.bundleID) carries no Container, so "
-                + "there is nothing for a backup to upload. Fields it did return: "
+                "设备自己为 \(PosterBoard.bundleID) 返回的记录里没有 Container，所以"
+                + "备份没有可上传的内容。它确实返回的字段有："
                 + "\(entry.keys.sorted().joined(separator: ", ")). The entry is forwarded "
-                + "verbatim from installation_proxy — it is not composed here — so this is the "
-                + "device declining to name the container, not a malformed request.")
+                + "原样转发的——不是在这里拼的——所以这是"
+                + "设备不肯说出容器，而不是请求格式有误。")
         }
 
         // 2. Host-side metadata. `isFullBackup: true` is the same marker the
@@ -109,7 +109,7 @@ enum PosterBoardBackup {
         // heartbeat: an upload that goes quiet is reported with the device's
         // liveness instead of looking like a slow one.
         try await StallGuard.run(
-            label: "PosterBoard fetch",
+            label: "PosterBoard 获取",
             idleSeconds: 120,
             idle: { counter.lastActivityAt },
             wire: { WireCensus.totals() },
@@ -186,13 +186,13 @@ enum PosterBoardBackup {
                     + "fix."
                 : ""
             throw GoldenNuggetError(
-                "The device uploaded nothing for \(PosterBoard.bundleID): \(counter.kept) of "
-                + "\(counter.total) offered file(s) went through the keep-filter and not one of "
-                + "them was \(PosterBoard.databaseFileName). Either the container was never "
-                + "offered — the factory info it was handed did not name it, or the device "
-                + "declined — or it was offered under a name the filter did not recognise; the "
-                + "names below tell the two apart. Offers: \(counter.sample()). "
-                + "(A kept count that is exactly the host's metadata set — Info.plist, "
+                "设备没有为 \(PosterBoard.bundleID) 上传任何东西：经过保留过滤的"
+                + "\(counter.total) 个候选文件里，没有一个是"
+                + "。要么容器从未"
+                + "被提供——交给它的出厂信息没有点名它，要么设备"
+                + "拒绝了——要么它以过滤器不认识的名字被提供；"
+                + "下面的名字能区分这两种情况。候选：\(counter.sample())。"
+                + "（如果保留数量恰好等于主机的元数据集——Info.plist、"
                 + "Manifest.plist, Status.plist, Manifest.db and its -shm/-wal — means the "
                 + "filter matched nothing the device streamed, not that the device sent "
                 + "nothing: check whether the names being matched are the device's or the "
@@ -205,7 +205,7 @@ enum PosterBoardBackup {
         let databases = captured.filter { PosterBoardSnapshot.storeVersion(relativePath: $0.relativePath) != nil }
             .sorted { structureVersion(of: $0.relativePath) > structureVersion(of: $1.relativePath) }
         guard let main = databases.first, let mainSource = main.source else {
-            throw GoldenNuggetError("The backup did not carry a database from the live PosterBoard container.")
+            throw GoldenNuggetError("这份备份没有带上实时 PosterBoard 容器中的数据库。")
         }
         let extracted = Extracted(main: mainSource,
             wal: captured.first { $0.relativePath == main.relativePath + "-wal" }?.source,
@@ -224,8 +224,8 @@ enum PosterBoardBackup {
         if let complaint = PosterBoardStore.diagnose(consolidated, strict: false) {
             log("PosterBoard: the fetched database was rejected — \(complaint). Tables: "
                 + "\(PosterBoardStore.describeTables(consolidated)).")
-            throw GoldenNuggetError("The PosterBoard database fetched from the device did not "
-                + "validate (\(complaint)). Fetch it again.")
+            throw GoldenNuggetError("从设备获取的 PosterBoard 数据库没有"
+                + "通过校验（\(complaint)）。请重新获取。")
         }
         log("PosterBoard: database ready — \(extracted.locatedBy), structure version "
             + "\(extracted.structureVersion), "
@@ -311,7 +311,7 @@ enum PosterBoardBackup {
         // Never copy -shm: SQLite must rebuild it against this exact WAL.
         try fold(source: scratch, into: snapshot)
         if let complaint = PosterBoardStore.diagnose(snapshot, strict: false) {
-            throw GoldenNuggetError("The downloaded PosterBoard store could not be prepared: "
+            throw GoldenNuggetError("下载的 PosterBoard 库无法准备好："
                 + complaint)
         }
         try fm.createDirectory(at: destination.deletingLastPathComponent(),
@@ -338,27 +338,27 @@ enum PosterBoardBackup {
             sqlite3_close(mergedHandle)
         }
         func failure(_ stage: String, _ db: OpaquePointer?) -> GoldenNuggetError {
-            GoldenNuggetError("PosterBoard snapshot \(stage) failed: "
+            GoldenNuggetError("PosterBoard 快照\(stage)失败："
                 + String(cString: sqlite3_errmsg(db))
-                + " (SQLite \(sqlite3_extended_errcode(db))).")
+                + "（SQLite \(sqlite3_extended_errcode(db))）。")
         }
         guard sqlite3_open_v2(sourcePath.path, &sourceHandle, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK,
               let source = sourceHandle else {
-            throw failure("opening downloaded store", sourceHandle)
+            throw failure("打开下载的库", sourceHandle)
         }
         guard sqlite3_open(destination.path, &mergedHandle) == SQLITE_OK,
               let merged = mergedHandle else {
-            throw failure("creating snapshot", mergedHandle)
+            throw failure("创建快照", mergedHandle)
         }
         sqlite3_busy_timeout(source, 1000)
         sqlite3_busy_timeout(merged, 1000)
         guard let backup = sqlite3_backup_init(merged, "main", source, "main") else {
-            throw failure("starting backup", merged)
+            throw failure("开始备份", merged)
         }
         let step = sqlite3_backup_step(backup, -1)
         let finish = sqlite3_backup_finish(backup)
         guard step == SQLITE_DONE, finish == SQLITE_OK else {
-            throw failure("copying pages (step \(step), finish \(finish))", merged)
+            throw failure("拷贝页面（步骤 \(step)，完成 \(finish)）", merged)
         }
         var statement: OpaquePointer?
         defer { sqlite3_finalize(statement) }
@@ -387,14 +387,14 @@ enum PosterBoardBackup {
               sqlite3_step(statement) == SQLITE_ROW,
               let mode = sqlite3_column_text(statement, 0),
               String(cString: mode).lowercased() == "wal" else {
-            throw failure("setting WAL journal mode", merged)
+            throw failure("设置 WAL 日志模式", merged)
         }
         sqlite3_finalize(statement)
         statement = nil
         guard sqlite3_prepare_v2(merged, "PRAGMA wal_checkpoint(TRUNCATE)", -1, &statement, nil) == SQLITE_OK,
               sqlite3_step(statement) == SQLITE_ROW,
               sqlite3_column_int(statement, 0) == 0 else {
-            throw failure("checkpointing the snapshot", merged)
+            throw failure("为快照做检查点", merged)
         }
     }
 

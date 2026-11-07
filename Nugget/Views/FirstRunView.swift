@@ -54,20 +54,20 @@ struct FirstRunView: View {
         /// The long verdict, carrying the values it judged — for the log.
         var text: String {
             switch self {
-            case .unchecked: return "Not checked yet"
-            case .interfaceMissing: return "No tunnel — \(Tunnel.ifaceIP) is not on any interface"
-            case .peerUnreachable: return "Tunnel interface is up, waiting for \(Tunnel.peerIP):\(Tunnel.servicePort)"
-            case .ready: return "Tunnel is up — \(Tunnel.peerIP):\(Tunnel.servicePort) answered"
+            case .unchecked: return "尚未检查"
+            case .interfaceMissing: return "没有隧道——\(Tunnel.ifaceIP) 不在任何接口上"
+            case .peerUnreachable: return "隧道接口已启动，正在等待 \(Tunnel.peerIP):\(Tunnel.servicePort)"
+            case .ready: return "隧道已通——\(Tunnel.peerIP):\(Tunnel.servicePort) 已回应"
             }
         }
 
         /// The short verdict a status pill can carry.
         var shortText: String {
             switch self {
-            case .unchecked: return "Not checked yet"
-            case .interfaceMissing: return "Tunnel not connected"
-            case .peerUnreachable: return "Waiting for the tunnel's other end"
-            case .ready: return "Tunnel is up"
+            case .unchecked: return "尚未检查"
+            case .interfaceMissing: return "隧道未连接"
+            case .peerUnreachable: return "正在等待隧道的另一端"
+            case .ready: return "隧道已通"
             }
         }
 
@@ -242,7 +242,7 @@ struct FirstRunView: View {
                          destination: 1)
                 stepCard(number: 2, title: "Pairing", done: pairingReady,
                          working: wirelessPair.isRunning,
-                         status: pairingReady ? "Pairing record in place" : "No pairing record yet",
+                         status: pairingReady ? "配对记录已就位" : "尚无配对记录",
                          destination: 2)
                 NativeNote("The PC version does step 2 for you — plug this iPhone in over USB and open GoldenNugget's “Mobile Helper”.")
                 NativeNote("If the tunnel was connected after the app started, close and reopen GoldenNugget once.")
@@ -302,7 +302,7 @@ struct FirstRunView: View {
         {
             VStack(alignment: .leading, spacing: 12) {
                 statusPill(done: pairingReady, working: wirelessPair.isRunning,
-                           text: pairingReady ? "Pairing record in place" : "No pairing record yet")
+                           text: pairingReady ? "配对记录已就位" : "尚无配对记录")
                 if wirelessPair.isRunning {
                     wirelessCard
                 } else {
@@ -362,7 +362,7 @@ struct FirstRunView: View {
                          destination: 1)
                 stepCard(number: 2, title: "Pairing", done: pairingReady,
                          working: wirelessPair.isRunning,
-                         status: pairingReady ? "Pairing record in place" : "No pairing record yet",
+                         status: pairingReady ? "配对记录已就位" : "尚无配对记录",
                          destination: 2)
                 NativeNote("Finish also starts copying this device's photos and videos in the background — “Restore media” on the home page puts it back after a reset.")
                 if !canFinish {

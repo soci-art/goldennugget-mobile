@@ -70,18 +70,18 @@ struct CommunityTemplate: Identifiable {
                        "/var/Managed Preferences/mobile/com.apple.purplebuddy.plist", "/var/mobile/Library/Backup/"]
         guard path.hasPrefix("/var/"), relativePath(String(path.dropFirst())),
               !blocked.contains(where: path.hasPrefix), let target = TweakDomainMap.split(path: path),
-              !target.relativePath.isEmpty else { throw CommunityError("Protected or unsupported template path: \(path)") }
+              !target.relativePath.isEmpty else { throw CommunityError("受保护或不受支持的模板路径：\(path)") }
         return target
     }
     static func validateValue(_ value: Any, depth: Int = 0) throws {
-        guard depth <= 16 else { throw CommunityError("Template values are nested too deeply.") }
+        guard depth <= 16 else { throw CommunityError("模板值嵌套过深。") }
         if let dict = value as? [String: Any] {
             for value in dict.values { try validateValue(value, depth: depth + 1) }
         } else if let array = value as? [Any] {
             for value in array { try validateValue(value, depth: depth + 1) }
         } else if let number = value as? NSNumber {
-            guard number.doubleValue.isFinite else { throw CommunityError("Nonfinite template value.") }
-        } else if !(value is String) { throw CommunityError("Invalid template plist value.") }
+            guard number.doubleValue.isFinite else { throw CommunityError("模板值不是有限数。") }
+        } else if !(value is String) { throw CommunityError("模板 plist 值无效。") }
     }
     static func load(_ url: URL, id: String? = nil) throws -> CommunityTemplate {
         let archive = try Archive(url: url, accessMode: .read)
@@ -90,22 +90,22 @@ struct CommunityTemplate: Identifiable {
         for entry in archive {
             let path = entry.path.hasSuffix("/") ? String(entry.path.dropLast()) : entry.path
             guard relativePath(path), entry.type != .symlink, entries[entry.path] == nil,
-                  entries.count < 4096 else { throw CommunityError("Unsafe template archive.") }
+                  entries.count < 4096 else { throw CommunityError("不安全的模板归档。") }
             total += UInt64(entry.uncompressedSize)
-            guard total <= 64 * 1024 * 1024 else { throw CommunityError("Template expands beyond 64 MB.") }
+            guard total <= 64 * 1024 * 1024 else { throw CommunityError("模板解开后超过 64 MB。") }
             entries[entry.path] = entry
         }
         func read(_ path: String, limit: Int) throws -> Data {
             guard let entry = entries[path], entry.type == .file, entry.uncompressedSize <= limit else {
-                throw CommunityError("Missing or oversized template resource: \(path)")
+                throw CommunityError("模板资源缺失或过大：\(path)")
             }
             var data = Data()
             let checksum = try archive.extract(entry) { chunk in
-                guard data.count + chunk.count <= limit else { throw CommunityError("Template resource is too large.") }
+                guard data.count + chunk.count <= limit else { throw CommunityError("模板资源过大。") }
                 data.append(chunk)
             }
             guard checksum == entry.checksum, data.count == Int(entry.uncompressedSize) else {
-                throw CommunityError("Corrupt template resource: \(path)")
+                throw CommunityError("模板资源已损坏：\(path)")
             }
             return data
         }
@@ -116,42 +116,42 @@ struct CommunityTemplate: Identifiable {
               let rows = raw["tweaks"] as? [[String: Any]], rows.count <= 64,
               (raw["options"] as? [Any] ?? []).isEmpty,
               !entries.keys.contains(where: { $0.split(separator: "/").contains("container") }) else {
-            throw CommunityError("Open this package on the Templates page to edit wallpaper options. The Community Catalog library accepts format-3 community-tweak packages.")
+            throw CommunityError("请在「模板」页打开这个包来编辑壁纸选项。社区目录库只接受格式 3 的社区调整包。")
         }
         let base = configPath.contains("/") ? String(configPath.prefix(through: configPath.lastIndex(of: "/")!)) : ""
         func text(_ raw: [String: Any], _ key: String, limit: Int, required: Bool = false) throws -> String {
             guard let string = (raw[key] ?? "") as? String, string.count <= limit,
                   !required || !string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                throw CommunityError("Invalid template text: \(key)")
+                throw CommunityError("模板文本无效：\(key)")
             }
             return string
         }
         func version(_ row: [String: Any], _ key: String) throws -> String {
             let value = try text(row, key, limit: 8)
             guard value.isEmpty || CommunityCatalog.matches(value, "^[0-9]{1,2}(\\.[0-9]{1,2}){0,2}$") else {
-                throw CommunityError("Invalid template iOS version.")
+                throw CommunityError("模板 iOS 版本无效。")
             }
             return value
         }
         var sourceBytes = 0
         func writes(_ raw: Any?) throws -> [Write] {
-            guard let rows = (raw ?? []) as? [[String: Any]] else { throw CommunityError("Invalid template writes.") }
+            guard let rows = (raw ?? []) as? [[String: Any]] else { throw CommunityError("模板写入无效。") }
             return try rows.map { row in
                 guard let kind = row["type"] as? String, ["plist", "file", "empty"].contains(kind),
-                      let path = row["path"] as? String else { throw CommunityError("Unknown template write.") }
+                      let path = row["path"] as? String else { throw CommunityError("未知的模板写入。") }
                 _ = try destination(path)
-                guard let owner = (row["owner"] ?? 501) as? NSNumber else { throw CommunityError("Invalid template file owner.") }
+                guard let owner = (row["owner"] ?? 501) as? NSNumber else { throw CommunityError("模板文件所有者无效。") }
                 guard CFGetTypeID(owner) != CFBooleanGetTypeID(), [0, 501].contains(owner.intValue),
-                      owner.doubleValue == Double(owner.intValue) else { throw CommunityError("Invalid template file owner.") }
+                      owner.doubleValue == Double(owner.intValue) else { throw CommunityError("模板文件所有者无效。") }
                 var values: [String: Any] = [:], data = Data()
                 if kind == "plist" {
-                    guard let dict = row["values"] as? [String: Any], !dict.isEmpty else { throw CommunityError("Missing plist values.") }
+                    guard let dict = row["values"] as? [String: Any], !dict.isEmpty else { throw CommunityError("缺少 plist 值。") }
                     try validateValue(dict); values = dict
                 } else if kind == "file" {
-                    guard let source = row["source"] as? String, relativePath(source) else { throw CommunityError("Unsafe source path.") }
+                    guard let source = row["source"] as? String, relativePath(source) else { throw CommunityError("不安全的源路径。") }
                     data = try read(base + source, limit: 4 * 1024 * 1024)
                     sourceBytes += data.count
-                    guard sourceBytes <= 16 * 1024 * 1024 else { throw CommunityError("Template source data exceeds 16 MB.") }
+                    guard sourceBytes <= 16 * 1024 * 1024 else { throw CommunityError("模板源数据超过 16 MB。") }
                 } else if path.hasSuffix(".plist") {
                     data = try PropertyListSerialization.data(fromPropertyList: [:], format: .xml, options: 0)
                 }
@@ -162,53 +162,53 @@ struct CommunityTemplate: Identifiable {
         let tweaks: [Tweak] = try rows.map { row in
             let id = try text(row, "id", limit: 64, required: true)
             guard CommunityCatalog.matches(id, "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"), seen.insert(id).inserted else {
-                throw CommunityError("Duplicate or invalid template tweak ID.")
+                throw CommunityError("模板调整 ID 重复或无效。")
             }
             let on = try writes(row["writes"]), off = try writes(row["writes_off"])
-            guard !(on + off).isEmpty, on.count + off.count <= 32 else { throw CommunityError("Invalid number of writes.") }
+            guard !(on + off).isEmpty, on.count + off.count <= 32 else { throw CommunityError("写入次数无效。") }
             var control: Control?
             if let value = row["control"], !(value is NSNull) {
-                guard let c = value as? [String: Any], let kind = c["type"] as? String else { throw CommunityError("Invalid control.") }
+                guard let c = value as? [String: Any], let kind = c["type"] as? String else { throw CommunityError("控件无效。") }
                 switch kind {
                 case "slider":
                     func number(_ key: String, _ fallback: Double) throws -> NSNumber {
                         let fallbackNumber = fallback.rounded() == fallback ? NSNumber(value: Int(fallback)) : NSNumber(value: fallback)
                         guard let value = (c[key] ?? fallbackNumber) as? NSNumber,
                               CFGetTypeID(value) != CFBooleanGetTypeID(), value.doubleValue.isFinite,
-                              abs(value.doubleValue) < 1e15 else { throw CommunityError("Invalid slider value.") }
+                              abs(value.doubleValue) < 1e15 else { throw CommunityError("滑块值无效。") }
                         return value
                     }
                     let low = try number("min", 0), high = try number("max", 1), step = try number("step", 1)
-                    guard low.doubleValue < high.doubleValue, step.doubleValue > 0 else { throw CommunityError("Invalid slider range.") }
+                    guard low.doubleValue < high.doubleValue, step.doubleValue > 0 else { throw CommunityError("滑块范围无效。") }
                     let integral = [low, high, step].allSatisfy { !CFNumberIsFloatType(unsafeBitCast($0, to: CFNumber.self)) }
                     let initial = min(high.doubleValue, max(low.doubleValue, try number("default", low.doubleValue).doubleValue))
                     control = Control(kind: kind, minimum: low.doubleValue, maximum: high.doubleValue, step: step.doubleValue,
                                       integral: integral, maxLength: 0, choices: [], initial: integral ? NSNumber(value: Int(initial)) : NSNumber(value: initial))
                 case "text":
                     guard let number = (c["max_length"] ?? 200) as? NSNumber,
-                          CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue == Double(number.intValue) else { throw CommunityError("Invalid text length.") }
+                          CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue == Double(number.intValue) else { throw CommunityError("文本长度无效。") }
                     let maxLength = number.intValue
-                    guard (1...1000).contains(maxLength), let initial = (c["default"] ?? "") as? String else { throw CommunityError("Invalid text control.") }
+                    guard (1...1000).contains(maxLength), let initial = (c["default"] ?? "") as? String else { throw CommunityError("文本控件无效。") }
                     control = Control(kind: kind, minimum: 0, maximum: 0, step: 1, integral: false,
                                       maxLength: maxLength, choices: [], initial: String(initial.prefix(maxLength)))
                 case "choice":
-                    guard let choices = c["choices"] as? [[String: Any]], (1...50).contains(choices.count) else { throw CommunityError("Invalid choices.") }
+                    guard let choices = c["choices"] as? [[String: Any]], (1...50).contains(choices.count) else { throw CommunityError("选项无效。") }
                     let parsed = try choices.map { choice -> (String, Any) in
                         let label = try text(choice, "label", limit: 80, required: true)
-                        guard let value = choice["value"] else { throw CommunityError("Missing choice value.") }
+                        guard let value = choice["value"] else { throw CommunityError("缺少选项值。") }
                         try validateValue(value); return (label, value)
                     }
                     guard let number = (c["default"] ?? 0) as? NSNumber,
-                          CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue == Double(number.intValue) else { throw CommunityError("Invalid choice index.") }
+                          CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue == Double(number.intValue) else { throw CommunityError("选项索引无效。") }
                     let index = number.intValue
-                    guard parsed.indices.contains(index) else { throw CommunityError("Invalid default choice.") }
+                    guard parsed.indices.contains(index) else { throw CommunityError("默认选项无效。") }
                     control = Control(kind: kind, minimum: 0, maximum: 0, step: 1, integral: false,
                                       maxLength: 0, choices: parsed, initial: parsed[index].1)
-                default: throw CommunityError("Unknown template control.")
+                default: throw CommunityError("未知的模板控件。")
                 }
             }
             guard let flag = (row["default"] ?? false) as? NSNumber, CFGetTypeID(flag) == CFBooleanGetTypeID() else {
-                throw CommunityError("A template switch default must be boolean.")
+                throw CommunityError("模板开关的默认值必须是布尔值。")
             }
             let enabled = flag.boolValue
             return Tweak(id: id, label: try text(row, "label", limit: 80, required: true),
@@ -273,7 +273,7 @@ struct CommunityTemplate: Identifiable {
     }
     func install(_ data: Data, id: String) throws {
         guard CommunityCatalog.matches(id, "^[a-z0-9][a-z0-9-]{1,47}$"), data.count <= 25 * 1024 * 1024 else {
-            throw CommunityError("Invalid template identifier or size.")
+            throw CommunityError("模板标识符或大小无效。")
         }
         try FileManager.default.createDirectory(at: CommunityCatalog.directory, withIntermediateDirectories: true)
         let temporary = CommunityCatalog.directory.appendingPathComponent(UUID().uuidString + ".part")
@@ -304,7 +304,7 @@ struct CommunityTemplate: Identifiable {
                 let source = URL(fileURLWithPath: path).standardizedFileURL
                 let root = CommunityCatalog.directory.standardizedFileURL.path + "/"
                 guard source.path.hasPrefix(root), !source.path.contains("/../") else {
-                    throw CommunityError("Template assets must be imported in a portable preset first.")
+                    throw CommunityError("模板资源必须先以便携预设的形式导入。")
                 }
                 let bytes = try Data(contentsOf: source)
                 let id = "preset-" + String(CommunityCatalog.hash(bytes).prefix(32))
@@ -355,13 +355,13 @@ struct CommunityTemplate: Identifiable {
             for tweak in template.tweaks where tweak.supports(version) {
                 for write in tweak.enabled ? tweak.writes : tweak.writesOff {
                     if write.kind == "plist" {
-                        guard files[write.path] == nil else { throw CommunityError("Templates conflict at \(write.path).") }
+                        guard files[write.path] == nil else { throw CommunityError("模板在 \(write.path) 处冲突。") }
                         let value = tweak.control?.clamp(tweak.value) ?? tweak.value
                         let values = write.values.mapValues { tweak.control == nil ? $0 : replace($0, with: value) }
                         plists[write.path, default: [:]].merge(values) { _, new in new }
                     } else {
                         guard plists[write.path] == nil, files[write.path] == nil || files[write.path] == write.data else {
-                            throw CommunityError("Templates conflict at \(write.path).")
+                            throw CommunityError("模板在 \(write.path) 处冲突。")
                         }
                         files[write.path] = write.data
                     }

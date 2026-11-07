@@ -80,8 +80,8 @@ enum PairingRecord {
     /// record has to be diagnosable from the log alone, because the alternative
     /// on a phone is "minimuxer did not start" with nothing to go on.
     static func sourceLabel(_ raw: String) -> String {
-        guard let keys = topLevelKeys(raw) else { return "not a parseable plist" }
-        return keys.isEmpty ? "(no keys)" : "keys: \(keys.sorted().joined(separator: ", "))"
+        guard let keys = topLevelKeys(raw) else { return "不是可解析的 plist" }
+        return keys.isEmpty ? "（无键）" : "keys: \(keys.sorted().joined(separator: ", "))"
     }
 
     /// The record at the canonical path, if it is one this app would hand to
@@ -135,21 +135,21 @@ enum PairingRecord {
         // here instead of being silently mangled on the way to disk.
         let data = try Data(contentsOf: url)
         guard let raw = String(data: data, encoding: .utf8) else {
-            throw GoldenNuggetError("\(url.lastPathComponent) is not UTF-8 text "
-                + "(\(data.count) bytes). A pairing file has to be an XML plist, which is what "
-                + "minimuxer parses — a binary plist has to be converted first.")
+            throw GoldenNuggetError("\(url.lastPathComponent) 不是 UTF-8 文本："
+                + "（\(data.count) 字节）。配对文件必须是 XML plist，因为"
+                + "minimuxer 解析的正是它——二进制 plist 必须先转换。")
         }
 
         let record = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !record.isEmpty else {
-            throw GoldenNuggetError("\(url.lastPathComponent) is empty — nothing to import. "
-                + "If it lives in iCloud Drive, open it in Files once so it is downloaded, "
-                + "then import it again.")
+            throw GoldenNuggetError("\(url.lastPathComponent) 是空的——没有可导入的内容。"
+                + "如果它在 iCloud 云盘里，请先在「文件」中打开一次让它下载下来，"
+                + "然后再导入一次。")
         }
         guard usable(record) else {
-            throw GoldenNuggetError("\(url.lastPathComponent) is not a property list "
-                + "(\(sourceLabel(record))). A pairing file has to be an XML plist — "
-                + "minimuxer parses nothing else.")
+            throw GoldenNuggetError("\(url.lastPathComponent) 不是属性列表："
+                + "（\(sourceLabel(record))）。配对文件必须是 XML plist——"
+                + "minimuxer 不解析其他格式。")
         }
 
         let dest = AppPaths.pairingFile
@@ -161,9 +161,9 @@ enum PairingRecord {
         let written = try String(contentsOf: dest, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard written == record else {
-            throw GoldenNuggetError("The pairing file did not survive being written to "
-                + "\(dest.lastPathComponent): \(written.count) of \(record.count) bytes came "
-                + "back. Import it again.")
+            throw GoldenNuggetError("配对文件在写入以下位置时没能存活："
+                + "\(dest.lastPathComponent)：\(record.count) 个字节只回来了 \(written.count) 个"
+                + "。请重新导入。")
         }
         return record
     }
@@ -181,9 +181,9 @@ enum PairingRecord {
     @discardableResult
     static func adoptFromDisk() throws -> String {
         guard let record = onDisk() else {
-            throw GoldenNuggetError("The pairing service finished but no usable record is at "
-                + "\(AppPaths.pairingFile.lastPathComponent) (\(sourceLabelOnDisk())). "
-                + "Import a pairing file instead.")
+            throw GoldenNuggetError("配对服务已完成，但在以下位置没有可用的记录："
+                + "\(AppPaths.pairingFile.lastPathComponent)（\(sourceLabelOnDisk())）。"
+                + "请改导入一份配对文件。")
         }
         persist(record)
         return record
