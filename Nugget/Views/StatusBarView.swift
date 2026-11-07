@@ -113,8 +113,8 @@ struct StatusBarView: View {
                 edited()
             }
             NativeNote(mechanism == .archive
-                ? "This writes \(StatusBarMechanism.archive.restorePath) in \(StatusBarMechanism.archive.domain)."
-                : "This writes \(StatusBarMechanism.classic.restorePath) in \(StatusBarMechanism.classic.domain).")
+                ? "这会把 \(StatusBarMechanism.archive.restorePath) 写入 \(StatusBarMechanism.archive.domain)。"
+                : "这会把 \(StatusBarMechanism.classic.restorePath) 写入 \(StatusBarMechanism.classic.domain)。")
         }
     }
 

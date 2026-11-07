@@ -411,9 +411,7 @@ struct SettingsView: View {
 
             if devModeOn {
                 switchRow("Force Partial Restore",
-                          note: "Takes the iOS 26 branch — a Partial Restore built "
-                              + "from nothing — even on a device that reports iOS 27+, "
-                              + "and skips the protective backup entirely.",
+                          note: "走 iOS 26 分支——从零构建部分恢复——即使设备报告的是 iOS 27+，并完全跳过保护性备份。",
                           isOn: $forcePartialRestore)
 
                 switchRow("Verbose log",
@@ -423,9 +421,7 @@ struct SettingsView: View {
                           isOn: $verboseLog)
 
                 switchRow("Skip AFC media",
-                          note: "A run normally copies camera-roll media between the "
-                              + "backup and the prune. This leaves it out, which on a full "
-                              + "camera roll is the difference between minutes and seconds.",
+                          note: "一次运行通常会在备份与清理之间拷贝相机胶卷媒体。开启此项会跳过这一步——当相机胶卷很满时，这就是几分钟和几秒钟的区别。",
                           isOn: $skipAfcMedia)
 
                 Button("Reset switches", systemImage: "arrow.counterclockwise") {

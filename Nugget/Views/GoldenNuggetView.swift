@@ -482,7 +482,7 @@ struct GoldenNuggetView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            NativePrimaryButton(title: restoringMedia ? "Restoring…" : "Restore media",
+            NativePrimaryButton(title: restoringMedia ? "正在恢复…" : "恢复媒体",
                                 systemImage: "arrow.uturn.backward.circle",
                                 running: restoringMedia,
                                 disabled: !canRestoreMedia) {
@@ -525,7 +525,7 @@ struct GoldenNuggetView: View {
     private func restoreMedia() {
         restoringMedia = true
         RunLog.shared.clear()
-        showStatus("Restoring media…", .accent, autoHide: false)
+        showStatus("正在恢复媒体…", .accent, autoHide: false)
         Task {
             var text = ""
             var tone: GoldenTone = .primary
@@ -555,7 +555,7 @@ struct GoldenNuggetView: View {
         guard !pages.isEmpty else { return }
         resetting = true
         RunLog.shared.clear()
-        showStatus("Resetting \(pages.count) page(s)…", .accent, autoHide: false)
+        showStatus("正在重置 \(pages.count) 个页面…", .accent, autoHide: false)
         Task {
             var text = ""
             var tone: GoldenTone = .primary
@@ -1166,7 +1166,7 @@ struct GoldenNuggetView: View {
         running = true
         runStarted = Date()
         RunLog.shared.clear()
-        showStatus("Applying…", .accent, autoHide: false)
+        showStatus("正在应用…", .accent, autoHide: false)
         let snapshot = tweakSelection
         let wallpapers = posterBoardSelection
         let statusBar = statusBarSelection

@@ -43,12 +43,9 @@ enum PosterBoardApplyMode: String, CaseIterable, Identifiable, Hashable {
     var summary: String {
         switch self {
         case .backup:
-            return "Fetches the store database, then carries the wallpapers through a "
-                + "protective backup. Works on every supported device, ends in a reboot."
+            return "先从设备获取商店数据库，再通过保护性备份送入壁纸。适用于所有受支持的设备，最后会重启设备。"
         case .airlift:
-            return "Writes into PosterBoard's container over a tunnel — no backup, and a "
-                + "respring instead of a reboot. Needs iOS 26.2 or newer, LocalDevVPN and "
-                + "an unlocked device."
+            return "通过隧道直接写进 PosterBoard 的容器——不做备份，以注销代替重启。需要 iOS 26.2 或更高版本、LocalDevVPN，且设备保持解锁。"
         }
     }
 

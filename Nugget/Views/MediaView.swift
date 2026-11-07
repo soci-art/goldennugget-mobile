@@ -141,8 +141,8 @@ struct MediaView: View {
                     .foregroundStyle(deleteOriginals ? Color.red : Color.primary)
             }
             NativeNote(deleteOriginals
-                ? "Originals up to 64 MiB are removed after the verified copy is saved for recovery. Larger originals stay on the device."
-                : "Off: copies are made and the originals stay put.")
+                ? "校验后的副本保存好以便恢复后，不超过 64 MiB 的原文件会被删除。更大的原文件会保留在设备上。"
+                : "关：只做拷贝，原文件保持不动。")
         }
     }
 

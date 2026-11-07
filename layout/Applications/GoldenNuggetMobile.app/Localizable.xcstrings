@@ -5426,6 +5426,566 @@
           }
         }
       }
+    },
+    "A `.batter` file is a ZIP holding a `config.json`: it names the domain to restore into and lists what you may change — an image to swap in, a colour, a number, which of three variants to install. Import one, fill in its options here, then press Apply on the home page. Nothing is written to the device until then." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "`.batter` 文件是一个 ZIP，里面有 `config.json`：它指定要恢复到哪个域，并列出你可以改的内容——要替换的图片、颜色、数字、三选一的变体。导入一个文件，在这里填好它的选项，然后到主页按「应用」。在此之前不会向设备写入任何东西。"
+          }
+        }
+      }
+    },
+    "A card downloads the wallpaper's `.tendies` pack and imports it into this app. It shows up on the PosterBoard page straight away; nothing is written to the device until you press Apply there." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卡片会下载壁纸的 `.tendies` 包并导入这个应用。它会立即出现在 PosterBoard 页面上；在那里按下「应用」之前，不会向设备写入任何东西。"
+          }
+        }
+      }
+    },
+    "A report wants all three: diagnostics.txt carries the keyword slice of the Rust log (mobilebackup2 protocol + jktcp flow verdict) for the last run plus the app log's tail, the app log says what was decided, and minimuxer.log says what the device answered." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "报告需要三样齐全：diagnostics.txt 带有上次运行 Rust 日志的关键词切片（mobilebackup2 协议 + jktcp 流量判定）以及应用日志的尾部；应用日志说明做了什么决定；minimuxer.log 说明设备如何回应。"
+          }
+        }
+      }
+    },
+    "App" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用"
+          }
+        }
+      }
+    },
+    "Checks mobile safety rules at launch and keeps a local copy for offline use. Rules can warn about tweaks, hide features, force daemon settings, or require an update." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在启动时检查移动端安全规则，并保留一份本地副本供离线使用。规则可以对调整发出警告、隐藏功能、强制守护进程设置，或要求更新。"
+          }
+        }
+      }
+    },
+    "Checks the two things this app needs before it can reach the device — the LocalDevVPN tunnel and a pairing record — and walks through both. This is the guide a first launch opens." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查这个应用连接设备前需要的两样东西——LocalDevVPN 隧道和配对记录——并逐步引导完成两者。这是首次启动时打开的指南。"
+          }
+        }
+      }
+    },
+    "Copied automatically at setup and on every launch; this writes every kept photo and video back to the device's Media folder." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在设置时和每次启动时自动拷贝；这会把保留的每一张照片和每一个视频写回到设备的 Media 文件夹。"
+          }
+        }
+      }
+    },
+    "Custom tunnel values are in use (Tunnel settings on the home page) — they must match LocalDevVPN." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在使用自定义隧道值（主页的隧道设置）——它们必须与 LocalDevVPN 一致。"
+          }
+        }
+      }
+    },
+    "Delivered by the **Apply** button on the home page, together with the tweaks. It fetches the store's database from the device first, so that run takes one extra exchange. Reboot the device afterwards — the store is read at boot." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由主页的**应用**按钮与调整一并送达。它会先从设备获取商店数据库，所以那一次运行会多一次交互。之后请重启设备——商店是在启动时读取的。"
+          }
+        }
+      }
+    },
+    "Device" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备"
+          }
+        }
+      }
+    },
+    "Each nulled file is written as 0 bytes, which makes the daemon that reads it fall back to its defaults." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个被清零的文件都写为 0 字节，这会让读取它的守护进程回退到默认设置。"
+          }
+        }
+      }
+    },
+    "Each template is copied into this app, so removing one here removes the copy — the file you imported is untouched." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个模板都会拷贝进这个应用，所以在这里删除一个模板删的是副本——你导入的原文件不受影响。"
+          }
+        }
+      }
+    },
+    "Emptying the store is only safe once the originals are back on the device and verified there." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有当原文件已经回到设备上并在设备上验证过，清空商店才是安全的。"
+          }
+        }
+      }
+    },
+    "Finish also starts copying this device's photos and videos in the background — “Restore media” on the home page puts it back after a reset." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成设置还会开始在后台拷贝这台设备的照片和视频——重置之后，可以用主页上的“恢复媒体”把它们放回去。"
+          }
+        }
+      }
+    },
+    "Finish setup" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成设置"
+          }
+        }
+      }
+    },
+    "Finish stays greyed out until both steps are ready." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在两个步骤都就绪之前，「完成」会保持灰色不可点。"
+          }
+        }
+      }
+    },
+    "GoldenNugget for desktop is the original this app is a port of. It runs the same protocols over its own Rust and Swift stack instead of driving pymobiledevice3, and speaks to iOS 26 and 27 rather than only to tethered devices." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "桌面版 GoldenNugget 是这个应用移植的原型。它用自己的 Rust 和 Swift 栈运行相同的协议，而不是驱动 pymobiledevice3，并且面向 iOS 26 和 27，而不只是有线连接的设备。"
+          }
+        }
+      }
+    },
+    "Hold a card against the reader while it listens." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在读卡器监听时，把卡贴近它。"
+          }
+        }
+      }
+    },
+    "If the tunnel was connected after the app started, close and reopen GoldenNugget once." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果隧道是在应用启动之后才连接的，请关闭并重新打开一次 GoldenNugget。"
+          }
+        }
+      }
+    },
+    "Install an updated mobile build and reopen the app. Downloading an IPA does not unblock this build." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安装更新后的移动端版本并重新打开应用。下载一个 IPA 并不能解除对当前版本的封锁。"
+          }
+        }
+      }
+    },
+    "Install the downloaded IPA with your sideloading tool." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用你的侧载工具安装下载好的 IPA。"
+          }
+        }
+      }
+    },
+    "Inverted: the targets are deleted while this is **off**." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反转：此项**关闭**时，目标会被删除。"
+          }
+        }
+      }
+    },
+    "Library" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "资源库"
+          }
+        }
+      }
+    },
+    "No helper? Pair on a computer (idevicepair, Sideloadly — tap Trust when the phone asks), send the .mobiledevicepairing file here, and import it above. The helper's “Save Pairing File to Disk” works the same way." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有辅助工具？在电脑上配对（idevicepair、Sideloadly——手机询问时点「信任」），把 .mobiledevicepairing 文件发到这里，再从上方导入。辅助工具的“将配对文件保存到磁盘”也是同样的用法。"
+          }
+        }
+      }
+    },
+    "No packs imported yet — import a `.tendies` above to apply it this way." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未导入任何包——在上方导入一个 `.tendies` 即可用这种方式应用。"
+          }
+        }
+      }
+    },
+    "No packs imported yet. A `.tendies` file is a ZIP holding a wallpaper's descriptor; import one from a wallpaper collection (Cowabunga and CaPlayground publish them), then Apply." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未导入任何包。`.tendies` 文件是一个装着壁纸描述文件的 ZIP；从壁纸合集导入一个（Cowabunga 和 CaPlayground 都有发布），然后点「应用」。"
+          }
+        }
+      }
+    },
+    "No templates imported yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未导入任何模板。"
+          }
+        }
+      }
+    },
+    "No wallpapers found. The catalogs are community-run and one of them may be down — the other source is still listed above." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有找到壁纸。这些目录由社区维护，其中一个可能暂时不可用——另一个来源仍在上方列出。"
+          }
+        }
+      }
+    },
+    "Nothing is read back from the device first: no original values are captured, so a file that was already custom before an apply is put back to its default rather than to what it held. The daemon list is the exception — it is written with the six entries a stock device ships. The selections in this app are left alone; applying again writes the tweaks back." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不会先从设备回读任何内容：不捕获原始值，所以某个在应用之前就已被修改过的文件，会被恢复到默认值，而不是它原先的内容。守护进程列表是例外——它会写入原生设备自带的六个条目。这个应用里的选择不会被动；再次应用会把调整重新写回去。"
+          }
+        }
+      }
+    },
+    "Nothing selected yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未选择任何内容。"
+          }
+        }
+      }
+    },
+    "Nothing selected yet. Whatever is picked here is delivered by the **Apply** button on the home page, together with the tweaks — one backup, one restore." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未选择任何内容。在这里选的一切都会由主页的**应用**按钮与调整一并送达——一次备份，一次恢复。"
+          }
+        }
+      }
+    },
+    "Personalize" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "个性化"
+          }
+        }
+      }
+    },
+    "Puts whole pages back to stock on the device. The next screen picks which ones and names the files it writes." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把设备上的整页设置恢复为原厂状态。下一屏选择要恢复哪些页，并列出它会写入的文件。"
+          }
+        }
+      }
+    },
+    "Reset Tweaks" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置调整"
+          }
+        }
+      }
+    },
+    "Save, switch and share complete tweak configurations. Loading a preset replaces the current selection; the home Apply still delivers it to the device." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存、切换和分享完整的调整配置。加载预设会替换当前选择；仍由主页的「应用」送达设备。"
+          }
+        }
+      }
+    },
+    "Send the file while the app is closed, then reopen it." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在应用关闭时发送文件，然后重新打开它。"
+          }
+        }
+      }
+    },
+    "Silly Mode forces every status-bar item on, over anything set above it. Turning it off restores exactly what you had." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "搞怪模式会强制打开每一个状态栏项目，覆盖上方的一切设置。关闭它会精确恢复到你原先的状态。"
+          }
+        }
+      }
+    },
+    "Skipping is not a dead end: this guide is in Settings afterwards." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跳过不是死路：之后可以在设置里找到这份指南。"
+          }
+        }
+      }
+    },
+    "Stop run" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止运行"
+          }
+        }
+      }
+    },
+    "Tap **Scan Cards** in the toolbar above." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点上方工具栏里的**扫描卡片**。"
+          }
+        }
+      }
+    },
+    "The **Apply** button on the home page delivers the tweaks, and the wallpapers you picked go with them in one protective backup — it is a backup-mode run regardless of this page's setting. To apply the packs alone, with no backup, use **Apply via AirLift** above." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主页的**应用**按钮会送达调整，你选的壁纸会随它们一起进入一次保护性备份——无论本页如何设置，这都是一次备份模式运行。若只想应用这些包、不做备份，请用上方的**通过 AirLift 应用**。"
+          }
+        }
+      }
+    },
+    "The PC version does step 2 for you — plug this iPhone in over USB and open GoldenNugget's “Mobile Helper”." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "电脑版会替你完成第 2 步——用 USB 连接这台 iPhone，打开 GoldenNugget 的“Mobile Helper”。"
+          }
+        }
+      }
+    },
+    "The card appears here — tap it to assign a skin." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卡片会显示在这里——点它来指定一个皮肤。"
+          }
+        }
+      }
+    },
+    "The chosen file is not kept between launches — re-pick it after reopening the app. Everything else you set here is." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选文件不会在两次启动之间保留——重新打开应用后请重新选择。你在这里设置的其他内容都会保留。"
+          }
+        }
+      }
+    },
+    "The database itself can be fetched on its own, from the card above — it is the one stage that can fail on its own terms (the device decides whether it will upload the container), so being able to run it, watch it and retry is worth its own button." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据库本身可以单独获取，就用上方那张卡片——这是唯一一个会以自身方式失败的阶段（由设备决定是否上传容器），所以值得给它一个单独的按钮，能独立运行、观察和重试。"
+          }
+        }
+      }
+    },
+    "The device asks for one file per locale, weight and key subtext. \"All languages\" writes every variant — it is the only setting that works on a device whose language you do not know — while the device's own locale and the fallback are always included either way." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备会按语言区域、字重和按键副文本各要一个文件。“所有语言”会写入每一个变体——这是唯一一个在不知道设备语言时也能用的设置——而设备自身的语言区域和回退项无论如何都会包含在内。"
+          }
+        }
+      }
+    },
+    "The keypad's artwork is written into /var/mobile/Library/Caches/TelephonyUI-…, which is a cache rather than a preference, so a backup cannot carry it. Lock the device to see the result." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拨号键盘的图稿会写入 /var/mobile/Library/Caches/TelephonyUI-……，那是缓存而不是偏好设置，所以备份带不走它。锁定设备即可看到效果。"
+          }
+        }
+      }
+    },
+    "The reset you have selected cannot be done over AirLift. Switch back to Protective backup to keep it." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你选择的重置无法通过 AirLift 完成。切回保护性备份才能保留它。"
+          }
+        }
+      }
+    },
+    "The store database is not part of this mode, so its card is hidden: the injection writes the descriptors straight into the container and the rows are not touched. Automatic refresh is ignored too." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "商店数据库不属于这种模式，所以它的卡片被隐藏了：注入会把描述文件直接写进容器，不触碰数据行。自动刷新也会被忽略。"
+          }
+        }
+      }
+    },
+    "The template's files are restored into this bundle's container. Its own note: this also changes files whose names start the same way." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模板的文件会被恢复进这个包的容器。它自带的说明：这也会改动文件名以相同前缀开头的文件。"
+          }
+        }
+      }
+    },
+    "The vendored copies carry local patches, listed with the reason for each in Vendor/patches/README.md. SideStore's minimuxer is © 2026 SideStore." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内置的副本带有本地补丁，每个补丁的原因都列在 Vendor/patches/README.md 里。SideStore 的 minimuxer © 2026 SideStore。"
+          }
+        }
+      }
+    },
+    "These are switches, not fixes. Force Partial Restore against a real iOS 27 device is expected to fail at the restore step, because a synthesised manifest carries no domain registration." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这些是开关，不是修复。对真实的 iOS 27 设备强制部分恢复，预计会在恢复步骤失败，因为合成的清单不带域注册信息。"
+          }
+        }
+      }
+    },
+    "These settings contradict each other. The later tweak wins on the device, so the result may not be what the list suggests." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这些设置彼此冲突。在设备上以后面的调整为准，所以结果可能与列表给人的印象不同。"
+          }
+        }
+      }
+    },
+    "This one is required: the template cannot be applied until a file is chosen." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这一项是必填的：选好文件之前无法应用该模板。"
+          }
+        }
+      }
+    },
+    "This template cannot be delivered by this app: it asks for sparserestore, which this app does not implement. Importing it is harmless — it is simply left out of the apply, and the run log says so rather than reporting success." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个模板无法由本应用送达：它要求 sparserestore，而本应用没有实现它。导入它没有危害——它只会被排除在应用之外，运行日志也会如实说明，而不是谎报成功。"
+          }
+        }
+      }
+    },
+    "iOS 27 replaced the status bar override file, so only the carrier entry can be changed here: its name, its service badge, signal bars and network type. The badge and the bars apply to the carrier name, so set one first. Signal bars are omitted unless explicitly set. Network type is a fixed visual badge and does not change the connection. Set a carrier name for each SIM; without a network selection its badge is hidden. The other options need iOS 26 or lower." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS 27 换掉了状态栏覆盖文件，所以这里只能改运营商条目：它的名称、服务徽标、信号格和网络类型。徽标和信号格作用于运营商名称，所以请先设置一个名称。信号格除非明确设置否则会省略。网络类型是一个固定的视觉徽标，不会改变实际连接。请为每张 SIM 设置运营商名称；没有选择网络时，其徽标会隐藏。其他选项需要 iOS 26 或更低版本。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
