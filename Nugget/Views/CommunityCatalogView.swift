@@ -180,7 +180,7 @@ struct CommunityCatalogView: View {
             let index = try await CommunityCatalog.fetch()
             entries = index.entries
             message = "\(entries.count) 个条目。已跳过 \(index.rejected) 个无效条目。"
-                + " \(entries.filter { CommunityCatalog.status($0) == "Update available" 个有可用更新。"
+                + " \(entries.filter { CommunityCatalog.status($0) == "Update available" }.count) 个有可用更新。"
                 + (index.cached ? " 正在显示离线缓存。" : "")
         } catch { message = error.localizedDescription }
     }

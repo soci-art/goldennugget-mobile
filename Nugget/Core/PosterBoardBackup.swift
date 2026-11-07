@@ -79,7 +79,7 @@ enum PosterBoardBackup {
             throw GoldenNuggetError(
                 "设备自己为 \(PosterBoard.bundleID) 返回的记录里没有 Container，所以"
                 + "备份没有可上传的内容。它确实返回的字段有："
-                + "\(entry.keys.sorted().joined(separator: ", ")). The entry is forwarded "
+                + "\(entry.keys.sorted().joined(separator: "、"))。该条目是从 installation_proxy "
                 + "原样转发的——不是在这里拼的——所以这是"
                 + "设备不肯说出容器，而不是请求格式有误。")
         }

@@ -64,13 +64,13 @@ enum PosterBoardStore {
         if strict {
             let missing = requiredTables.filter { !tableExists(db, $0) }
             guard missing.isEmpty else {
-                return "missing table(s): \(missing.joined(separator: ", "))"
+                return "缺少表：\(missing.joined(separator: "、"))"
             }
         } else {
             let tables = tableNames(db).map { $0.lowercased() }
             guard tables.contains(where: { $0.contains("poster") }) else {
                 return "没有以 PosterBoard 命名的表（表："
-                    + "\(tables.isEmpty ? "none" : tables.joined(separator: ", ")))"
+                    + "\(tables.isEmpty ? "无" : tables.joined(separator: "、")))"
             }
         }
         var statement: OpaquePointer?

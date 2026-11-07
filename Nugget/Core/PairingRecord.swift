@@ -81,7 +81,7 @@ enum PairingRecord {
     /// on a phone is "minimuxer did not start" with nothing to go on.
     static func sourceLabel(_ raw: String) -> String {
         guard let keys = topLevelKeys(raw) else { return "不是可解析的 plist" }
-        return keys.isEmpty ? "（无键）" : "keys: \(keys.sorted().joined(separator: ", "))"
+        return keys.isEmpty ? "（无键）" : "键：\(keys.sorted().joined(separator: "、"))"
     }
 
     /// The record at the canonical path, if it is one this app would hand to
