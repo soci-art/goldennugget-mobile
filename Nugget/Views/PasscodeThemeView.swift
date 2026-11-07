@@ -180,7 +180,7 @@ struct PasscodeThemeView: View {
                 do {
                     let loaded = try await PasscodeThemeReader.inspect(url: url)
                     theme = loaded
-                    status = "Loaded \(loaded.name)."
+                    status = "已加载 \(loaded.name)。"
                     tone = .primary
                 } catch {
                     status = error.localizedDescription
@@ -208,7 +208,7 @@ struct PasscodeThemeView: View {
                     log: { line in Task { @MainActor in log.append(line) } },
                     progress: { _ in }
                 )
-                status = "Theme applied. Lock the device to see it."
+                status = "主题已应用。锁定设备即可查看。"
                 tone = .primary
             } catch {
                 status = error.localizedDescription

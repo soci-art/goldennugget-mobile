@@ -347,7 +347,7 @@ struct WalletView: View {
         }
         scanning = true
         log = []
-        status = "Listening. Hold a card against the reader."
+        status = "正在监听。请将卡片贴近读卡器。"
         tone = .secondary
         Task { @MainActor in
             do {
@@ -372,7 +372,7 @@ struct WalletView: View {
         guard !cards.contains(where: { $0.id == identifier }) else { return }
         cards.append(WalletCard(id: identifier))
         WalletCardStore.save(cards)
-        status = "Found \(identifier.prefix(10))…"
+        status = "找到 \(identifier.prefix(10))…"
         tone = .primary
     }
 
@@ -390,7 +390,7 @@ struct WalletView: View {
                     log: { line in Task { @MainActor in log.append(line) } },
                     progress: { _ in }
                 )
-                status = "Card skins applied."
+                status = "卡片皮肤已应用。"
                 tone = .primary
             } catch {
                 status = error.localizedDescription

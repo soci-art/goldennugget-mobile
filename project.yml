@@ -68,6 +68,10 @@
 #     the dark half intact.  No loose PNGs are bundled: they are light-only and
 #     would shadow it.
 name: GoldenNuggetMobile
+knownRegions:
+  - en
+  - zh-Hans
+  - Base
 options:
   bundleIdPrefix: com.awesomenull
   # The source language of Localizable.xcstrings / InfoPlist.xcstrings.  XcodeGen

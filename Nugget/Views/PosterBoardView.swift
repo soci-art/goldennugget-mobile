@@ -622,7 +622,7 @@ struct PosterBoardView: View {
         running = true
         runStarted = Date()
         RunLog.shared.clear()
-        status = "Fetching the PosterBoard database…"
+        status = "正在获取 PosterBoard 数据库…"
         statusTone = .accent
         Task {
             var text = ""
@@ -658,7 +658,7 @@ struct PosterBoardView: View {
         running = true
         runStarted = Date()
         RunLog.shared.clear()
-        status = "Injecting the packs over AirLift…"
+        status = "正在通过 AirLift 注入这些包…"
         statusTone = .accent
         Task {
             var text = ""

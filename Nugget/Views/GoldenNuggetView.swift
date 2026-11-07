@@ -1291,7 +1291,7 @@ struct GoldenNuggetView: View {
             guard Tunnel.waitForTunnel(log: { line in GoldenNuggetEngine.shared.log(line) }) else {
                 tunnelStage.done("FAILED")
                 DispatchQueue.main.async {
-                    errorText = "Tunnel not ready: \(Tunnel.peerIP):\(Tunnel.servicePort) unreachable.\n\n\(Tunnel.requirements)"
+                    errorText = "隧道未就绪：\(Tunnel.peerIP):\(Tunnel.servicePort) 不可达。\n\n\(Tunnel.requirements)"
                 }
                 return
             }
@@ -1375,14 +1375,14 @@ struct GoldenNuggetView: View {
                         GoldenNuggetEngine.shared.log("minimuxer readiness failed: \(reason)")
                         GoldenNuggetEngine.shared.log("minimuxer.log tail:\n\(tail)")
                         DispatchQueue.main.async {
-                            errorText = "minimuxer started but never became ready.\n\n\(reason)\n\nLast minimuxer.log lines:\n\(tail)"
+                            errorText = "minimuxer 已启动但始终未能就绪。\n\n\(reason)\n\nminimuxer.log 的最后几行：\n\(tail)"
                         }
                     }
                 } catch {
                     let tail = RustLog.tail()
                     GoldenNuggetEngine.shared.log("minimuxer.log tail:\n\(tail)")
                     DispatchQueue.main.async {
-                        errorText = "\(error.localizedDescription)\n\nLast minimuxer.log lines:\n\(tail)"
+                        errorText = "\(error.localizedDescription)\n\nminimuxer.log 的最后几行：\n\(tail)"
                     }
                 }
             }

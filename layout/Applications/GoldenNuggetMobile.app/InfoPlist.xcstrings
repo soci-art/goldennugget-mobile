@@ -10,6 +10,12 @@
             "state" : "translated",
             "value" : "GoldenNugget publishes an iOS 27 wireless pairing service on the local network so this iPhone can pair with itself and generate its own pairing file without a computer."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GoldenNugget 会在本地网络上发布一项 iOS 27 无线配对服务，让这台 iPhone 能与自身配对，并在没有电脑的情况下生成自己的配对文件。"
+          }
         }
       }
     },
@@ -22,9 +28,14 @@
             "state" : "translated",
             "value" : "Mobile Device Pairing File"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移动设备配对文件"
+          }
         }
       }
     }
-  },
-  "version" : "1.0"
+  }
 }

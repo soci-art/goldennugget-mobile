@@ -507,13 +507,13 @@ struct TemplatesView: View {
                 let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
                 guard size <= 25 * 1024 * 1024 else { throw CommunityError("Template exceeds 25 MB.") }
                 try CommunityTemplateStore.shared.install(Data(contentsOf: url), id: "local-" + UUID().uuidString.lowercased())
-                status = "Imported \(community.title). Review it in Community template switches before Apply."
+                status = "已导入 \(community.title)。应用前请在社区模板开关中检查它。"
                 statusTone = .secondary
                 return
             }
             let template = try TemplateImports.import(from: url, deviceVersion: identity.version)
             selection.loadFromDisk(deviceVersion: identity.version)
-            status = "Imported \(template.title)."
+            status = "已导入 \(template.title)。"
             statusTone = .secondary
             RunLog.shared.append("Templates: imported \(url.lastPathComponent) as "
                 + "\"\(template.title)\" (\(template.domain), \(template.options.count) option(s)).")

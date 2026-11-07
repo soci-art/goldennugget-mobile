@@ -28,7 +28,7 @@ struct WallpaperDownloadsView: View {
     @State private var search = ""
 
     @State private var wallpapers: [Wallpaper] = []
-    @State private var status = "Loading wallpapers…"
+    @State private var status = "正在加载壁纸…"
     @State private var statusTone: GoldenTone = .secondary
     @State private var error: String?
     @State private var loading = false
@@ -226,7 +226,7 @@ struct WallpaperDownloadsView: View {
     private func load() async {
         loading = true
         error = nil
-        status = "Loading wallpapers…"
+        status = "正在加载壁纸…"
         statusTone = .secondary
         let result = await WallpaperCatalog.load(source: source, category: category)
         wallpapers = result.wallpapers
@@ -236,7 +236,7 @@ struct WallpaperDownloadsView: View {
             status = result.failures.isEmpty ? "No wallpapers found" : "Failed to load wallpapers"
             statusTone = result.failures.isEmpty ? .secondary : .error
         } else {
-            status = "\(result.wallpapers.count) wallpapers"
+            status = "\(result.wallpapers.count) 张壁纸"
                 + (result.failures.isEmpty ? "" : " (\(result.failures.joined(separator: "; ")))")
             statusTone = result.failures.isEmpty ? .secondary : .warning
         }
@@ -264,7 +264,7 @@ struct WallpaperDownloadsView: View {
         guard importing == nil else { return }
         importing = wallpaper.id
         error = nil
-        status = "Downloading \(wallpaper.name)…"
+        status = "正在下载 \(wallpaper.name)…"
         statusTone = .secondary
 
         Task {
@@ -288,7 +288,7 @@ struct WallpaperDownloadsView: View {
                         + "on the PosterBoard page first.")
                 }
                 selection.loadFromDisk()
-                status = "Imported \(wallpaper.name)"
+                status = "已导入 \(wallpaper.name)"
                 statusTone = .success
                 RunLog.shared.append("Wallpapers: imported \(pack.name) (\(pack.summary)) "
                     + "from \(wallpaper.sourceLabel)")

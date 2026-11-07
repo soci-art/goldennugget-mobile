@@ -49,7 +49,7 @@ struct CommunityCatalogView: View {
                 Button("Save shared preset") {
                     do {
                         let name = try CommunityCatalog.store(PresetShareCode.decode(code), name: codeName)
-                        message = "Saved \(name). Load it from Presets when ready."
+                        message = "已保存 \(name)。准备好后从预设中加载它。"
                         code = ""; epoch += 1
                     } catch { message = error.localizedDescription }
                 }.disabled(code.isEmpty)
@@ -68,7 +68,7 @@ struct CommunityCatalogView: View {
                             defer { busy = nil }
                             do {
                                 try await GoldenNuggetEngine.shared.resetCommunityTweaks()
-                                message = "Community preferences reset. Reboot the device; other replaced files are listed in the run log."
+                                message = "社区偏好已重置。请重启设备；其他被替换的文件列在运行日志中。"
                             } catch { message = error.localizedDescription }
                         }
                     }.disabled(busy != nil)
@@ -179,7 +179,7 @@ struct CommunityCatalogView: View {
         do {
             let index = try await CommunityCatalog.fetch()
             entries = index.entries
-            message = "\(entries.count) entries. \(index.rejected) invalid entries skipped."
+            message = "\(entries.count) 个条目。已跳过 \(index.rejected) 个无效条目。"
                 + " \(entries.filter { CommunityCatalog.status($0) == "Update available" }.count) updates available."
                 + (index.cached ? " Showing the offline cache." : "")
         } catch { message = error.localizedDescription }
@@ -193,10 +193,10 @@ struct CommunityCatalogView: View {
                 let data = try await CommunityCatalog.download(url, limit: 25 * 1024 * 1024)
                 guard data.count == entry.size, CommunityCatalog.hash(data) == entry.digest else { throw CommunityError("Template checksum does not match the catalog.") }
                 try library.install(data, id: entry.id)
-                message = "Template installed. Review its switches before Apply."
+                message = "模板已安装。应用前请检查它的开关。"
             } else {
                 let name = try CommunityCatalog.installPreset(entry)
-                message = "Saved \(name). Load it from Presets when ready."
+                message = "已保存 \(name)。准备好后从预设中加载它。"
             }
             epoch += 1
         } catch { message = error.localizedDescription }
@@ -212,16 +212,16 @@ struct CommunityCatalogView: View {
             }
             _ = try PresetShareCode.decode(value)
             code = value
-            message = "QR code read. Choose a name and save the shared preset."
+            message = "二维码已读取。请选择一个名称并保存这个共享预设。"
         } else if url.pathExtension.lowercased() == "batter" {
             let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
             guard size <= 25 * 1024 * 1024 else { throw CommunityError("Template exceeds 25 MB.") }
             try library.install(Data(contentsOf: url), id: "local-" + UUID().uuidString.lowercased())
-            message = "Template imported."
+            message = "模板已导入。"
         } else {
             let result = PortablePreset.importFile(url)
             guard result.0 else { throw CommunityError(result.1) }
-            message = "Preset \(result.1) imported."
+            message = "预设 \(result.1) 已导入。"
         }
         epoch += 1
     }

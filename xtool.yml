@@ -55,4 +55,5 @@ resources:
   # per language when a translation lands.  `en.lproj` is always generated, even
   # while the catalog has no translations, so a clean checkout builds.
   - build/localizations/en.lproj
+  - build/localizations/zh-Hans.lproj
 entitlementsPath: entitlements.plist

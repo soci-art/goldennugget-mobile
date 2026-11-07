@@ -177,3 +177,14 @@ See [rule format and behavior](docs/hotload-and-updates.md).
 [0xjonhnnydev]: https://github.com/0xjohnnydev
 [awesomenull]: https://github.com/awesomenull-dev
 [AirLift]: https://github.com/0xjohnnydev/airlift
+
+## Changes from upstream （汉化说明）
+
+This fork of **GoldenNugget** (original project: [GoldenNugget-Team/GoldenNugget-mobile](https://github.com/GoldenNugget-Team/GoldenNugget-mobile), desktop: [awesomenull-dev/GoldenNugget](https://github.com/awesomenull-dev/GoldenNugget)) adds a full Simplified Chinese (zh-Hans) localization, 2026-11-07:
+
+- `Localizable.xcstrings` / `InfoPlist.xcstrings`: zh-Hans translations for all 527 UI strings.
+- Tweak and daemon catalogs (`TweakCatalog.swift`, `TweakCatalogDaemons.swift`): titles, details, warnings and section names translated in place.
+- A set of view status messages translated in place.
+- Build config: `zh-Hans` added to `knownRegions` (project.yml) and to the xtool resource list (xtool.yml).
+
+No features were changed. All credits and the GPLv3 license are preserved as upstream.

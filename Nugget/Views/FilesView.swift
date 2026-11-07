@@ -571,7 +571,7 @@ struct FilesView: View {
             // read the previewer can seek in, which means a 40 MB video is 40 MB
             // over the wire and 40 MB in the temp directory before the first
             // frame. Hiding that behind a tap would be the surprise.
-            status = "Fetching \(entry.name) · \(AfcFileExplorer.format(entry.size)) to preview"
+            status = "正在获取 \(entry.name) · \(AfcFileExplorer.format(entry.size)) 以预览"
             let local = try await AfcFileExplorer.pullToTemporaryFile(entry) { fraction in
                 Task { @MainActor in pullProgress = fraction }
             }
@@ -591,7 +591,7 @@ struct FilesView: View {
             let local = try await AfcFileExplorer.pull(entry) { fraction in
                 Task { @MainActor in pullProgress = fraction }
             }
-            status = "Pulled \(entry.name) → \(local.lastPathComponent)"
+            status = "已拉取 \(entry.name) → \(local.lastPathComponent)"
             error = nil
         } catch {
             self.error = error.localizedDescription
@@ -605,7 +605,7 @@ struct FilesView: View {
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         do {
             let entry = try await AfcFileExplorer.push(url, to: AfcFileExplorer.join(path))
-            status = "Uploaded \(entry.name)"
+            status = "已上传 \(entry.name)"
             error = nil
             await load()
         } catch {
@@ -650,7 +650,7 @@ struct FilesView: View {
         defer { busy = false }
         do {
             try await AfcFileExplorer.delete(entry)
-            status = "Deleted \(entry.name)"
+            status = "已删除 \(entry.name)"
             error = nil
             await load()
         } catch {
